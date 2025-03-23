@@ -1,0 +1,158 @@
+#+TITLE: Claude Usage Guidelines for Legal RAG System
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Guidelines for using Claude with the Legal RAG system project
+
+* Claude Usage Guidelines for Legal RAG System
+
+** Project Overview
+
+The Legal RAG System implements a jurisdiction-aware Retrieval-Augmented Generation system for legal research. The project is built with:
+
+- Hy (a Lisp dialect embedded in Python)
+- Org-mode for literate programming
+- FAISS for vector search
+- OpenAI embeddings for document retrieval
+
+** Development Workflow
+
+*** Setting Up the Environment
+
+#+begin_src bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Install dependencies
+make dev
+
+# Tangle code from org files
+make tangle
+#+end_src
+
+*** Running Tests
+
+#+begin_src bash
+# Run all tests
+make test
+
+# Run tests with coverage
+make coverage
+#+end_src
+
+*** Formatting and Linting
+
+#+begin_src bash
+# Check formatting
+make lint
+
+# Apply formatting
+make format
+#+end_src
+
+** Git Commit Guidelines
+
+*** Conventional Commits
+
+All commits must follow the conventional commits format:
+
+#+begin_example
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+#+end_example
+
+Types include:
+- ~feat~ - A new feature
+- ~fix~ - A bug fix
+- ~docs~ - Documentation changes
+- ~style~ - Formatting changes
+- ~refactor~ - Code refactoring
+- ~perf~ - Performance improvements
+- ~test~ - Adding or modifying tests
+- ~build~ - Build system changes
+- ~ci~ - CI configuration changes
+
+*** Git Trailers
+
+*IMPORTANT*: All commits MUST include agent attribution trailers.
+
+Use the helper script (preferred method):
+#+begin_src bash
+./scripts/git-commit-with-trailers.sh "feat(jurisdiction): add international support" file1.hy file2.hy
+#+end_src
+
+Or manually add trailers:
+#+begin_src bash
+git commit --no-gpg-sign \
+  --trailer="Driving-Agent: aygp-dr" \
+  --trailer="LLM-Agent: claude-code" \
+  --trailer="LLM-Model: claude-3-7-sonnet-20250219" \
+  --trailer="Reviewed-by: jwalsh" \
+  --trailer="Session-id: SESSION-20250323-jwalsh-XYZ1" \
+  -m "Your commit message"
+#+end_src
+
+*CRITICAL REQUIREMENTS*:
+- NEVER use GPG signing (always use ~--no-gpg-sign~)
+- Do NOT include "Generated with Claude" or "Co-Authored-By: Claude" in any part of the commit
+- Only use git trailers for attribution, NOT the commit message body
+- Always include all relevant trailers (Driving-Agent, LLM-Agent, LLM-Model, Reviewed-by, Session-id)
+
+** Org-Mode Literate Programming
+
+All implementation should be done through org-mode literate programming:
+
+1. Edit the ~src/legal_rag.org~ file to add/modify code
+2. Use the tangling header for each section:
+   #+begin_example
+   ** Component Name
+   :PROPERTIES:
+   :header-args:hy: :tangle src/legal_rag/component.hy
+   :END:
+   #+end_example
+3. Run ~make tangle~ to generate code files
+4. Run tests to verify functionality
+
+** Documentation Style
+
+- All documentation should use org-mode format (~.org~ files)
+- Code examples should be in source blocks with appropriate language
+- Use proper heading levels (*, **, ***, etc.)
+- Include metadata in the file header (title, author, date, etc.)
+
+** Code Style Guidelines
+
+*** Hy Style
+
+- Use lisp-case for function and variable names (~defn calculate-score~ not ~defn calculateScore~)
+- 2-space indentation
+- Semicolons for comments
+- Use threading macros (~->>~) for cleaner data pipelines
+- Prefer functional patterns over imperative ones
+
+*** Python Integration
+
+- When interfacing with Python code, follow PEP 8
+- Use snake_case for Python functions/variables
+- Use docstrings for all public functions
+- Include type hints where appropriate
+
+** Citation and Attribution
+
+When using the project in academic work, include the proper citation:
+
+#+begin_src bibtex
+@software{legal_rag_hy,
+  author       = {Kumar, Kushagra and Walsh, Jason and Tao, Xianglong and Pace, Aidan and Jensen-Grey, Sean},
+  title        = {Legal RAG: A Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research},
+  year         = {2025},
+  publisher    = {GitHub},
+  url          = {https://github.com/defrecord/legal-rag-hy}
+}
+#+end_src
+
+This can be generated using ~make citation~.

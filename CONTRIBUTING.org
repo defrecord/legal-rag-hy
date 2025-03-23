@@ -1,0 +1,166 @@
+#+TITLE: Contributing to Legal RAG System
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Guidelines and instructions for contributing to the Legal RAG System
+
+* Contributing to Legal RAG System
+
+Thank you for your interest in contributing to the Legal RAG System! This document provides guidelines and instructions for contributing.
+
+** Code of Conduct
+
+By participating in this project, you agree to abide by our Code of Conduct:
+
+- Be respectful and inclusive
+- Value diverse perspectives
+- Focus on constructive feedback
+- Maintain professional communication
+
+** Getting Started
+
+1. *Fork the repository* on GitHub
+2. *Clone your fork* locally
+3. *Install development dependencies*:
+   #+begin_src bash
+   pip install -e ".[dev]"
+   #+end_src
+4. *Create a branch* for your feature/fix:
+   #+begin_src bash
+   git checkout -b feature/your-feature-name
+   #+end_src
+
+** Development Process
+
+*** Writing Code
+
+We use Hy, a Lisp dialect embedded in Python. If you're new to Hy, check out the [[https://docs.hylang.org/][official documentation]].
+
+Key style conventions:
+- Use lisp-case for function and variable names
+- Provide docstrings for all functions and classes
+- Keep functions small and focused
+- Follow functional programming patterns where appropriate
+- Use org-mode literate programming for implementation
+
+*** Testing
+
+All new code should include tests:
+
+#+begin_src bash
+# Run tests
+pytest tests/
+
+# Run tests with coverage
+pytest --cov=legal_rag tests/
+#+end_src
+
+Aim for at least 80% test coverage for new code.
+
+*** Documentation
+
+Update documentation when you make changes:
+
+- Update relevant code docstrings
+- Update org files in the =docs/= directory
+- Add examples for new features
+- Use org-mode for all documentation
+
+*** Submitting Changes
+
+1. *Commit your changes* with clear commit messages following conventional commits format:
+   #+begin_example
+   feat(jurisdiction): add international jurisdiction support
+   
+   - Add UK, Canada, and Australia to jurisdiction hierarchy
+   - Implement boost factors for cross-national citations
+   - Update documentation with international examples
+   #+end_example
+
+2. *Add git trailers* to your commit using the provided script:
+   #+begin_src bash
+   # Use the git-commit-with-trailers helper script
+   ./scripts/git-commit-with-trailers.sh "feat(jurisdiction): add international jurisdiction support"
+   #+end_src
+
+   Or manually add the required trailers:
+   #+begin_src bash
+   git commit --no-gpg-sign \
+     --trailer="Driving-Agent: YOUR_AGENT" \
+     --trailer="LLM-Agent: MODEL_AGENT" \
+     --trailer="LLM-Model: MODEL_VERSION" \
+     --trailer="Reviewed-by: REVIEWER" \
+     --trailer="Session-id: SESSION-YYYYMMDD-USERNAME-XYZ" \
+     -m "YOUR_COMMIT_MESSAGE"
+   #+end_src
+
+3. *Push to your fork*:
+   #+begin_src bash
+   git push origin feature/your-feature-name
+   #+end_src
+
+4. *Create a Pull Request* against the main repository
+
+** Pull Request Process
+
+1. Update the README.org or documentation with details of your changes
+2. Add appropriate tests for your changes
+3. Ensure CI checks pass on your pull request
+4. Request a review from a maintainer
+5. Address any feedback from the code review
+
+** Literate Programming Workflow
+
+We use org-mode literate programming to maintain code and documentation together:
+
+1. Main implementation is in =src/legal_rag.org=
+2. Edit the org file to modify both code and documentation
+3. Use the Makefile to tangle code:
+   #+begin_src bash
+   make tangle
+   #+end_src
+4. Run tests on the generated code:
+   #+begin_src bash
+   make test
+   #+end_src
+
+** Feature Requests and Bug Reports
+
+Please use GitHub Issues to submit feature requests and bug reports. Include as much detail as possible:
+
+For bugs:
+- Description of the issue
+- Steps to reproduce
+- Expected vs. actual behavior
+- Version information
+- Error messages or stack traces
+
+For features:
+- Clear description of the proposed feature
+- Explanation of the benefit
+- Any implementation ideas
+- Links to relevant research/papers if applicable
+
+** Legal Considerations
+
+When contributing, you confirm that your contributions are your original work and that you have the right to license them under the project's license.
+
+** Citation
+
+If you use this project in academic research, please cite it:
+
+#+begin_src bibtex
+@software{legal_rag_hy,
+  author       = {Kumar, Kushagra and Walsh, Jason and Tao, Xianglong and Pace, Aidan and Jensen-Grey, Sean},
+  title        = {Legal RAG: A Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research},
+  year         = {2025},
+  publisher    = {GitHub},
+  url          = {https://github.com/defrecord/legal-rag-hy}
+}
+#+end_src
+
+** Questions?
+
+If you have questions, please open a GitHub Discussion or reach out to the maintainers directly.
+
+Thank you for contributing to the Legal RAG System!

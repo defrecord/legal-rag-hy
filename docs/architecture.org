@@ -1,0 +1,198 @@
+#+TITLE: Legal RAG System Architecture
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Architecture of the Legal RAG system
+
+* Legal RAG System Architecture
+
+This document outlines the architecture of the Legal RAG (Retrieval-Augmented Generation) system for jurisdiction-aware legal research.
+
+** System Components
+
+The Legal RAG system is built using a modular architecture with the following components:
+
+#+begin_src
+┌─────────────────────────────────────────────────────────────────┐
+│                       Legal RAG System                           │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+    ┌─────────────────┬─────────┴──────────┬─────────────────┐
+    │                 │                    │                 │
+┌───▼────┐       ┌────▼────┐         ┌─────▼─────┐      ┌───▼────┐
+│ Query  │       │ Vector  │         │ Context   │      │ Answer │
+│ Module │       │ Search  │         │ Formation │      │ Module │
+└───┬────┘       └────┬────┘         └─────┬─────┘      └───┬────┘
+    │                 │                    │                 │
+    │           ┌─────┴──────┐             │                 │
+    │           │            │             │                 │
+┌───▼───┐   ┌───▼───┐    ┌───▼───┐     ┌───▼───┐        ┌───▼───┐
+│ NLP   │   │ FAISS │    │Juris- │     │ Doc   │        │  LLM  │
+│Process│   │Vector │    │diction│     │Format │        │Service│
+└───────┘   │  DB   │    │Module │     └───────┘        └───────┘
+            └───────┘    └───────┘
+                │            │
+            ┌───▼───┐    ┌───▼───┐
+            │ Cache │    │Citation│
+            │Service│    │Network │
+            └───────┘    └───────┘
+#+end_src
+
+*** Core Components
+
+1. *Query Module*
+   - Processes and optimizes user queries
+   - Extracts jurisdiction information when available
+   - Identifies query type (factual, analytical, procedural)
+
+2. *Vector Search*
+   - Retrieves semantically similar documents
+   - Implements jurisdiction-aware ranking
+   - Uses FAISS for efficient similarity search
+   - Integrates with embedding cache
+
+3. *Context Formation*
+   - Formats retrieved documents for LLM consumption
+   - Organizes documents by relevance
+   - Adds jurisdiction-specific context cues
+   - Includes citation information
+
+4. *Answer Generation*
+   - Produces well-cited responses using LLM
+   - Ensures jurisdiction awareness
+   - Formats citations correctly
+   - Adds confidence metrics
+
+5. *Evaluation Framework*
+   - Assesses response quality
+   - Monitors jurisdiction compliance
+   - Tracks citation accuracy
+   - Calculates confidence scores
+
+*** Support Components
+
+1. *Embedding Cache*
+   - Implements TTL-based caching
+   - Reduces API costs
+   - Improves response time
+   - Supports version tracking
+
+2. *Jurisdiction Module*
+   - Models legal hierarchy
+   - Calculates precedential boost values
+   - Maps jurisdictions to one another
+   - Integrates with citation network
+
+3. *Citation Network*
+   - Analyzes citation relationships
+   - Tracks citation frequency
+   - Considers citation direction
+   - Weights by authority level
+
+** Data Flow
+
+The typical data flow through the system follows these steps:
+
+1. *Query Reception*
+   - Legal query is received along with optional jurisdiction context
+   - Query is processed and optimized for semantic search
+
+2. *Document Retrieval*
+   - Query is embedded using appropriate model
+   - Embedding is used to search vector database
+   - Jurisdiction boosting is applied to results
+   - Top K documents are retrieved
+
+3. *Context Formation*
+   - Retrieved documents are formatted for LLM
+   - Documents are ordered by relevance
+   - Citations are properly formatted
+   - Query is incorporated into prompt
+
+4. *Answer Generation*
+   - LLM generates a response using the formatted context
+   - Response includes citations to specific documents
+   - Answer is tailored to jurisdiction when relevant
+
+5. *Response Evaluation*
+   - System evaluates answer quality
+   - Citations are verified and validated
+   - Confidence score is calculated
+   - Response is returned to user
+
+** Key Design Patterns
+
+The Legal RAG system leverages several functional programming patterns from Hy (a Lisp dialect for Python):
+
+1. *Immutable Data Structures*
+   - Documents and embeddings are treated as immutable
+   - Processing occurs through transformation pipelines
+
+2. *Threading Macros*
+   - =->>= threading macro for data transformation chains
+   - Makes document processing pipelines readable
+
+3. *Retry Patterns with Decorators*
+   - =retry_with_exponential_backoff= for API resilience
+   - =timeout= for performance guarantees
+
+4. *Function Composition*
+   - Higher-order functions for processing pipelines
+   - Pure functions for predictable behavior
+
+** Performance Considerations
+
+The system optimizes performance through several strategies:
+
+1. *Embedding Cache*
+   - Reduces redundant API calls
+   - Implements TTL to balance freshness and cost
+
+2. *Vector Database Optimization*
+   - FAISS for efficient similarity search
+   - Supports both exact and approximate search
+
+3. *Concurrent Processing*
+   - Parallel document embedding
+   - Asynchronous API calls
+
+4. *Resource Management*
+   - Controlled token usage
+   - Optimized context formation
+
+** Error Handling
+
+Robust error handling is implemented through:
+
+1. *Graceful Degradation*
+   - Fallback options when services are unavailable
+   - Simplified responses when full processing fails
+
+2. *Retry Mechanisms*
+   - Exponential backoff for transient failures
+   - Maximum retry limits
+
+3. *Comprehensive Logging*
+   - Detailed error information
+   - Performance metrics
+   - Usage statistics
+
+** Security Considerations
+
+The system implements several security measures:
+
+1. *API Key Management*
+   - Environment variables for sensitive credentials
+   - No hardcoded secrets
+
+2. *Input Validation*
+   - Sanitization of user inputs
+   - Validation of document sources
+
+3. *Data Segregation*
+   - Isolation between different user contexts
+   - Jurisdiction-aware data handling
+
+** Conclusion
+
+The Legal RAG system architecture combines modern RAG techniques with domain-specific legal knowledge to create a powerful, accurate, and efficient legal research tool. The modular design allows for easy extension and customization while maintaining performance and reliability.

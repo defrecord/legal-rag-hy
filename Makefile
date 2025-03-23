@@ -1,84 +1,77 @@
-.PHONY: setup test clean lint docs build install dev help cache-clear
+# Legal RAG System Makefile
+# 
+# This Makefile provides commands for development, testing, and documentation.
 
-# Variables
-PYTHON := python3
-HY := hy
-PIP := uv pip
-PYTEST := uv run pytest
-COVERAGE := uv run coverage
-PYLINT := uv run pylint
-BLACK := uv run black
-ISORT := uv run isort
-SOURCE_DIR := src
-TEST_DIR := tests
+.PHONY: help clean tangle test coverage lint format docs install dev citation
 
-# Default target
+# Default target shows help
 help:
-	@echo "Legal RAG System with Hy"
-	@echo "------------------------"
-	@echo "setup        - Install dependencies"
-	@echo "test         - Run tests"
-	@echo "coverage     - Run tests with coverage"
-	@echo "lint         - Run linting checks"
-	@echo "format       - Format code with black and isort"
-	@echo "docs         - Generate documentation"
-	@echo "build        - Build package"
-	@echo "install      - Install package"
-	@echo "dev          - Install in development mode"
-	@echo "clean        - Remove build artifacts"
-	@echo "cache-clear  - Clear embedding cache"
-	@echo "demo         - Run interactive demo"
+	@echo "Legal RAG System - Jurisdiction-aware RAG for legal research"
+	@echo ""
+	@echo "Usage:"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Example:"
+	@echo "  make test       # Run all tests"
+	@echo "  make coverage   # Run tests with coverage report"
 
-# Setup
-setup:
-	uv venv
-	$(PIP) install -e ".[dev]"
+clean: ## Clean generated files and caches
+	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .coverage htmlcov/
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type d -name .ipynb_checkpoints -exec rm -rf {} +
 
-# Test
-test:
-	$(PYTEST) $(TEST_DIR)
+tangle: ## Extract code from org files
+	@echo "Tangling code from org files..."
+	emacs --batch \
+		--eval "(require 'org)" \
+		--eval "(dolist (file (directory-files-recursively \"./src\" \"\\.org$\")) (with-current-buffer (find-file file) (org-babel-tangle)))" \
+		--kill
 
-coverage:
-	$(COVERAGE) run -m pytest $(TEST_DIR)
-	$(COVERAGE) report -m
-	$(COVERAGE) html
+install: ## Install the package
+	uv pip install -e .
 
-# Linting
-lint:
-	$(PYLINT) $(SOURCE_DIR)
-	$(BLACK) --check $(SOURCE_DIR) $(TEST_DIR)
-	$(ISORT) --check-only --profile black $(SOURCE_DIR) $(TEST_DIR)
+dev: ## Install development dependencies
+	uv pip install -e ".[dev]"
 
-# Formatting
-format:
-	$(BLACK) $(SOURCE_DIR) $(TEST_DIR)
-	$(ISORT) --profile black $(SOURCE_DIR) $(TEST_DIR)
+test: ## Run tests
+	pytest tests/
 
-# Documentation
-docs:
-	cd docs && $(MAKE) html
+coverage: ## Run tests with coverage report
+	pytest --cov=src tests/ --cov-report=term --cov-report=html
+	@echo "HTML coverage report generated in htmlcov/index.html"
 
-# Build and install
-build:
-	$(PYTHON) -m build
+lint: ## Run linters (flake8, black, isort)
+	flake8 src/ tests/
+	black --check src/ tests/
+	isort --check-only src/ tests/
 
-install:
-	$(PIP) install .
+format: ## Format code with black and isort
+	black src/ tests/
+	isort src/ tests/
 
-dev:
-	$(PIP) install -e ".[dev]"
+docs: ## Generate documentation
+	@echo "Generating documentation..."
+	mkdir -p docs/html
+	emacs --batch \
+		--eval "(require 'org)" \
+		--eval "(require 'ox-html)" \
+		--eval "(dolist (file (directory-files-recursively \"./docs\" \"\\.org$\")) (with-current-buffer (find-file file) (org-html-export-to-html)))" \
+		--kill
+	@echo "Documentation generated in docs/html/"
 
-# Clean
-clean:
-	rm -rf build/ dist/ *.egg-info/ .coverage htmlcov/ .pytest_cache/ __pycache__/ 
-	find . -name "__pycache__" -exec rm -rf {} +
-	find . -name "*.pyc" -delete
-	find . -name "*.hy~" -delete
+citation: ## Generate citation file (BibTeX)
+	@echo "Generating citation file..."
+	mkdir -p docs/citation
+	cat PROJECT_STATUS.org | grep -A 15 "begin_src bibtex" | grep -v "begin_src" | grep -v "end_src" > docs/citation/citation.bib
+	@echo "Citation file generated in docs/citation/citation.bib"
 
-# Clear cache
-cache-clear:
-	rm -rf $(SOURCE_DIR)/legal_rag/cache/*.pkl
+run-demo: ## Run the interactive demo
+	@echo "Running Legal RAG demo..."
+	cd src && hy legal_rag/demo.hy
 
-# Demo
-demo:
-	$(HY) $(SOURCE_DIR)/legal_rag/demo.hy
+notebook: ## Start Jupyter notebook for examples
+	jupyter notebook examples/
+
+version: ## Show the current version
+	@grep "__version__" src/legal_rag/__init__.hy | cut -d '"' -f2
