@@ -40,13 +40,11 @@ jobs:
         mkdir -p tests
         if [ ! -f tests/__init__.py ]; then touch tests/__init__.py; fi
         if [ ! -f tests/test_placeholder.py ]; then
-          cat > tests/test_placeholder.py << 'EOF'
-import unittest
-
-class TestPlaceholder(unittest.TestCase):
-    def test_placeholder(self):
-        self.assertTrue(True)
-EOF
+          echo "import unittest" > tests/test_placeholder.py
+          echo "" >> tests/test_placeholder.py
+          echo "class TestPlaceholder(unittest.TestCase):" >> tests/test_placeholder.py
+          echo "    def test_placeholder(self):" >> tests/test_placeholder.py
+          echo "        self.assertTrue(True)" >> tests/test_placeholder.py
         fi
         
         python -m pytest tests/ --cov=src/ --cov-report=xml
