@@ -1,0 +1,105 @@
+#+TITLE: Claude Code Development Notes for Legal RAG System
+#+AUTHOR: DefRecord Team (via Claude Code)
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Documentation of Claude Code's contributions to the Legal RAG system project
+
+* Claude Code Development Notes
+
+This document tracks Claude Code's contributions to the Legal RAG system project.
+
+** Project Overview
+
+The Legal RAG System provides a jurisdiction-aware Retrieval-Augmented Generation system for legal research, implemented in Hy and using org-mode literate programming.
+
+** Key Contributions
+
+*** Day 1 (2025-03-23)
+
+*Key Components Implemented*:
+
+1. *Core RAG System with Jurisdiction Awareness*
+   - Implemented vector search with jurisdiction-based boosting
+   - Created embedding cache with TTL support
+   - Developed citation parsing and formatting
+   - Built comprehensive evaluation framework
+   - Implemented error handling with retries and timeouts
+
+2. *Repository Infrastructure*
+   - Set up GitHub repository and CI/CD with GitHub Actions
+   - Created org-mode documentation structure
+   - Implemented Makefile with dynamic help
+   - Added BibTeX citation generation
+   - Converted all documentation to org-mode format
+
+3. *Demonstration Components*
+   - Created interactive demo application
+   - Developed Jupyter notebook example with visualizations
+   - Added example legal documents for testing
+
+4. *Development Tools*
+   - Added git-commit-with-trailers.sh script
+   - Implemented proper attribution in all commits
+   - Created comprehensive CLAUDE.org guidelines
+
+** Attribution Details
+
+This project was developed with:
+
+- *Driving Agent*: aygp-dr
+- *LLM Agent*: claude-code
+- *LLM Model*: claude-3-7-sonnet-20250219
+- *Reviewer*: Jason Walsh (jwalsh)
+- *Session ID*: Multiple sessions on 2025-03-23
+
+*** Commit Attribution
+
+All commits include proper git trailers for attribution:
+
+#+begin_example
+Driving-Agent: aygp-dr
+LLM-Agent: claude-code
+LLM-Model: claude-3-7-sonnet-20250219
+Reviewed-by: jwalsh
+Session-id: SESSION-YYYYMMDD-USERNAME-XYZ
+#+end_example
+
+** Documentation Strategy
+
+Documentation for this project follows these principles:
+
+1. *Org-mode for Everything*
+   - All documentation uses org-mode format
+   - Code and documentation maintained together through literate programming
+   - Both developer and user documentation in same format
+
+2. *Consistent Structure*
+   - Clear hierarchy of concepts with proper headings
+   - Code examples in source blocks with language specification
+   - Diagrams and visualizations where appropriate
+
+3. *Attribution and Citation*
+   - Complete attribution for all contributions
+   - BibTeX citation available via ~make citation~
+   - Citation recommended for academic use
+
+** Future Roadmap
+
+The next development phases should focus on:
+
+1. International jurisdiction support
+2. Multi-lingual capabilities
+3. Enhanced citation network analysis
+4. REST API and CLI tools
+5. Web interface for interactive use
+
+** Conclusion
+
+This project demonstrates the power of combining:
+
+1. Functional programming (via Hy)
+2. Literate programming (via org-mode)
+3. LLM-assisted development (via Claude)
+4. Legal domain knowledge (jurisdiction-aware RAG)
+
+The jurisdiction-aware retrieval approach significantly improves legal research by ensuring results respect the hierarchical nature of legal precedent.
