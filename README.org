@@ -4,10 +4,10 @@
 #+DATE: 2025-03-23
 #+DESCRIPTION: A jurisdiction-aware Retrieval-Augmented Generation system for legal research built with Hy and org-mode literate programming
 
-[[https://github.com/defrecord/legal-rag-hy/actions/workflows/ci.yml/badge.svg][https://github.com/defrecord/legal-rag-hy/actions/workflows/ci.yml/badge.svg]]
-[[https://img.shields.io/github/v/release/defrecord/legal-rag-hy][https://img.shields.io/github/v/release/defrecord/legal-rag-hy]]
-[[https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue.svg][https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue.svg]]
-[[https://img.shields.io/badge/license-MIT-green.svg][https://img.shields.io/badge/license-MIT-green.svg]]
+[[https://github.com/defrecord/legal-rag-hy/actions/workflows/ci.yml][file:https://github.com/defrecord/legal-rag-hy/actions/workflows/ci.yml/badge.svg]]
+[[https://github.com/defrecord/legal-rag-hy/releases][file:https://img.shields.io/github/v/release/defrecord/legal-rag-hy]]
+[[https://docs.hylang.org][file:https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue.svg]]
+[[LICENSE][file:https://img.shields.io/badge/license-MIT-green.svg]]
 
 A jurisdiction-aware Retrieval-Augmented Generation (RAG) system for legal research, built with Hy and org-mode literate programming.
 
