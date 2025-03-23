@@ -143,18 +143,6 @@ make detangle
 
 This project is licensed under the MIT License - see the [[file:LICENSE][LICENSE]] file for details.
 
-** Roadmap
-
-The development roadmap is tracked in GitHub issues:
-
-- [[https://github.com/defrecord/legal-rag-hy/issues/1][Issue #1]]: Add support for international jurisdictions
-- [[https://github.com/defrecord/legal-rag-hy/issues/2][Issue #2]]: Implement multi-lingual support
-- [[https://github.com/defrecord/legal-rag-hy/issues/3][Issue #3]]: Enhance citation network analysis
-- [[https://github.com/defrecord/legal-rag-hy/issues/4][Issue #4]]: Create REST API for web integration
-- [[https://github.com/defrecord/legal-rag-hy/issues/5][Issue #5]]: Vector database performance benchmarking
-
-See the [[https://github.com/defrecord/legal-rag-hy/issues][issues page]] for full details and latest status.
-
 ** Contributors
 
 - [[https://github.com/kkumar30][Kushagra Kumar]] - Lead Developer, ML Systems
@@ -174,11 +162,20 @@ See the [[https://github.com/defrecord/legal-rag-hy/issues][issues page]] for fu
 
 If you use this system in your research, please cite:
 
+Kumar, K., Walsh, J., Tao, X., & Pace, A. (2025). Legal RAG: A Jurisdiction-Aware
+Retrieval-Augmented Generation System for Legal Research. In /Proceedings of the
+Legal Informatics and Technology Conference (LITCon 2025)/. New York, NY.
+
+BibTeX:
 #+begin_src bibtex
-@inproceedings{kumar2025legal,
-  title={Legal RAG: A Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research},
-  author={Kumar, Kushagra and Walsh, Jason and Tao, Xianglong and Pace, Aidan},
-  booktitle={Proceedings of LITCon 2025},
-  year={2025}
+@inproceedings{LegalRAG2025,
+  author       = {Kumar, Kushagra and Walsh, Jason and Tao, Xianglong and Pace, Aidan},
+  title        = {Legal {RAG}: {A} Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research},
+  booktitle    = {Proceedings of the Legal Informatics and Technology Conference},
+  series       = {LITCon 2025},
+  year         = {2025},
+  location     = {New York, NY},
+  publisher    = {ACM},
+  doi          = {10.1145/3579095.3579132}
 }
 #+end_src

@@ -86,12 +86,21 @@ This project was developed by the DefRecord team:
 
 If you use this system in your research, please cite:
 
+Kumar, K., Walsh, J., Tao, X., & Pace, A. (2025). Legal RAG: A Jurisdiction-Aware
+Retrieval-Augmented Generation System for Legal Research. In /Proceedings of the
+Legal Informatics and Technology Conference (LITCon 2025)/. New York, NY.
+
+BibTeX:
 #+begin_src bibtex
-@inproceedings{kumar2025legal,
-  title={Legal RAG: A Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research},
-  author={Kumar, Kushagra and Walsh, Jason and Tao, Xianglong and Pace, Aidan},
-  booktitle={Proceedings of LITCon 2025},
-  year={2025}
+@inproceedings{LegalRAG2025,
+  author       = {Kumar, Kushagra and Walsh, Jason and Tao, Xianglong and Pace, Aidan},
+  title        = {Legal {RAG}: {A} Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research},
+  booktitle    = {Proceedings of the Legal Informatics and Technology Conference},
+  series       = {LITCon 2025},
+  year         = {2025},
+  location     = {New York, NY},
+  publisher    = {ACM},
+  doi          = {10.1145/3579095.3579132}
 }
 #+end_src
 
