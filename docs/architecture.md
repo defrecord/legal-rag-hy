@@ -1,140 +1,192 @@
-# System Architecture
+# Legal RAG System Architecture
 
-The Legal RAG System is built with a modular architecture optimized for legal research. This document provides an overview of the system components and their interactions.
+This document outlines the architecture of the Legal RAG (Retrieval-Augmented Generation) system for jurisdiction-aware legal research.
 
-## High-Level Architecture
+## System Components
+
+The Legal RAG system is built using a modular architecture with the following components:
 
 ```
-                   ┌───────────────┐
-                   │    Query      │
-                   └───────┬───────┘
-                           ▼
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-│  Embedding    │◄─┤    Vector     │─►│ Jurisdiction  │
-│    Cache      │  │    Search     │  │  Hierarchy    │
-└───────────────┘  └───────┬───────┘  └───────────────┘
-                           ▼
-                   ┌───────────────┐
-                   │    Context    │
-                   │   Formation   │
-                   └───────┬───────┘
-                           ▼
-                   ┌───────────────┐
-                   │    Answer     │
-                   │  Generation   │
-                   └───────┬───────┘
-                           ▼
-┌───────────────┐  ┌───────────────┐
-│  Citation     │◄─┤   Response    │
-│   Analysis    │  │   Evaluation  │
-└───────────────┘  └───────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                       Legal RAG System                           │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+    ┌─────────────────┬─────────┴──────────┬─────────────────┐
+    │                 │                    │                 │
+┌───▼────┐       ┌────▼────┐         ┌─────▼─────┐      ┌───▼────┐
+│ Query  │       │ Vector  │         │ Context   │      │ Answer │
+│ Module │       │ Search  │         │ Formation │      │ Module │
+└───┬────┘       └────┬────┘         └─────┬─────┘      └───┬────┘
+    │                 │                    │                 │
+    │           ┌─────┴──────┐             │                 │
+    │           │            │             │                 │
+┌───▼───┐   ┌───▼───┐    ┌───▼───┐     ┌───▼───┐        ┌───▼───┐
+│ NLP   │   │ FAISS │    │Juris- │     │ Doc   │        │  LLM  │
+│Process│   │Vector │    │diction│     │Format │        │Service│
+└───────┘   │  DB   │    │Module │     └───────┘        └───────┘
+            └───────┘    └───────┘
+                │            │
+            ┌───▼───┐    ┌───▼───┐
+            │ Cache │    │Citation│
+            │Service│    │Network │
+            └───────┘    └───────┘
 ```
 
-## Core Components
+### Core Components
 
-### 1. Query Processing
+1. **Query Module**
+   - Processes and optimizes user queries
+   - Extracts jurisdiction information when available
+   - Identifies query type (factual, analytical, procedural)
 
-Handles legal queries and prepares them for effective retrieval, including:
-- Query normalization
-- Legal term identification
-- Jurisdiction extraction
+2. **Vector Search**
+   - Retrieves semantically similar documents
+   - Implements jurisdiction-aware ranking
+   - Uses FAISS for efficient similarity search
+   - Integrates with embedding cache
 
-### 2. Vector Search
+3. **Context Formation**
+   - Formats retrieved documents for LLM consumption
+   - Organizes documents by relevance
+   - Adds jurisdiction-specific context cues
+   - Includes citation information
 
-Provides efficient similarity search with jurisdiction awareness:
-- FAISS-based vector database
-- Custom ranking with jurisdiction boosting
-- Precedent-aware search scoring
+4. **Answer Generation**
+   - Produces well-cited responses using LLM
+   - Ensures jurisdiction awareness
+   - Formats citations correctly
+   - Adds confidence metrics
 
-### 3. Context Formation
+5. **Evaluation Framework**
+   - Assesses response quality
+   - Monitors jurisdiction compliance
+   - Tracks citation accuracy
+   - Calculates confidence scores
 
-Structures retrieved documents for optimal LLM processing:
-- Document ranking and selection
-- Citation formatting
-- Context assembly with relevance indicators
+### Support Components
 
-### 4. Answer Generation
+1. **Embedding Cache**
+   - Implements TTL-based caching
+   - Reduces API costs
+   - Improves response time
+   - Supports version tracking
 
-Produces accurate, well-cited responses using LLMs:
-- Context-aware prompting
-- Citation verification
-- Factual accuracy optimization
+2. **Jurisdiction Module**
+   - Models legal hierarchy
+   - Calculates precedential boost values
+   - Maps jurisdictions to one another
+   - Integrates with citation network
 
-### 5. Embedding Cache
+3. **Citation Network**
+   - Analyzes citation relationships
+   - Tracks citation frequency
+   - Considers citation direction
+   - Weights by authority level
 
-Optimizes performance and reduces API costs:
-- TTL-based caching
-- Version tracking for embeddings
-- Automatic cache invalidation
+## Data Flow
 
-### 6. Evaluation Module
+The typical data flow through the system follows these steps:
 
-Assesses system performance with multiple metrics:
-- Citation accuracy
-- Answer relevance
-- Hallucination detection
-- Jurisdiction compliance
+1. **Query Reception**
+   - Legal query is received along with optional jurisdiction context
+   - Query is processed and optimized for semantic search
 
-## Key Optimizations
+2. **Document Retrieval**
+   - Query is embedded using appropriate model
+   - Embedding is used to search vector database
+   - Jurisdiction boosting is applied to results
+   - Top K documents are retrieved
 
-### Production-Ready Features
+3. **Context Formation**
+   - Retrieved documents are formatted for LLM
+   - Documents are ordered by relevance
+   - Citations are properly formatted
+   - Query is incorporated into prompt
 
-The system includes several optimizations for production use:
+4. **Answer Generation**
+   - LLM generates a response using the formatted context
+   - Response includes citations to specific documents
+   - Answer is tailored to jurisdiction when relevant
 
-1. **Scalable Vector Database**: 
-   - Partitioning for large collections
-   - Indexed searches for performance
-   - Batch processing for efficiency
+5. **Response Evaluation**
+   - System evaluates answer quality
+   - Citations are verified and validated
+   - Confidence score is calculated
+   - Response is returned to user
 
-2. **Embedding Cache**:
-   - Reduces API calls by ~80%
-   - TTL-based expiration
-   - Version tracking for model updates
+## Key Design Patterns
 
-3. **Failure Handling**:
-   - Exponential backoff for API calls
-   - Graceful degradation with fallbacks
-   - Comprehensive error reporting
+The Legal RAG system leverages several functional programming patterns from Hy (a Lisp dialect for Python):
 
-4. **Performance**:
-   - Parallel document processing
-   - Asynchronous embedding generation
+1. **Immutable Data Structures**
+   - Documents and embeddings are treated as immutable
+   - Processing occurs through transformation pipelines
+
+2. **Threading Macros**
+   - `->>` threading macro for data transformation chains
+   - Makes document processing pipelines readable
+
+3. **Retry Patterns with Decorators**
+   - `retry_with_exponential_backoff` for API resilience
+   - `timeout` for performance guarantees
+
+4. **Function Composition**
+   - Higher-order functions for processing pipelines
+   - Pure functions for predictable behavior
+
+## Performance Considerations
+
+The system optimizes performance through several strategies:
+
+1. **Embedding Cache**
+   - Reduces redundant API calls
+   - Implements TTL to balance freshness and cost
+
+2. **Vector Database Optimization**
+   - FAISS for efficient similarity search
+   - Supports both exact and approximate search
+
+3. **Concurrent Processing**
+   - Parallel document embedding
+   - Asynchronous API calls
+
+4. **Resource Management**
+   - Controlled token usage
    - Optimized context formation
 
-## Jurisdiction-Aware Design
+## Error Handling
 
-A unique feature of the system is its jurisdiction awareness:
+Robust error handling is implemented through:
 
-1. **Jurisdiction Hierarchy**:
-   - Full US Federal and State hierarchy
-   - Circuit court relationships
-   - Precedential value calculation
+1. **Graceful Degradation**
+   - Fallback options when services are unavailable
+   - Simplified responses when full processing fails
 
-2. **Relevance Boosting**:
-   - Controlling precedent prioritization
-   - Jurisdiction-specific weighting
-   - Citation network analysis
+2. **Retry Mechanisms**
+   - Exponential backoff for transient failures
+   - Maximum retry limits
 
-3. **Citation Handling**:
-   - Standardized citation formats
-   - Jurisdiction identification from citations
-   - Citation validation and normalization
+3. **Comprehensive Logging**
+   - Detailed error information
+   - Performance metrics
+   - Usage statistics
 
-## Deployment Considerations
+## Security Considerations
 
-For production deployment, consider:
+The system implements several security measures:
 
-1. **Scaling Vector Database**:
-   - For >1M documents, use distributed FAISS
-   - Consider GPU acceleration for large indices
-   - Implement database sharding by jurisdiction
+1. **API Key Management**
+   - Environment variables for sensitive credentials
+   - No hardcoded secrets
 
-2. **API Cost Management**:
-   - Configure embedding cache TTL based on update frequency
-   - Implement batch embedding generation
-   - Consider hosting your own embedding model for high volume
+2. **Input Validation**
+   - Sanitization of user inputs
+   - Validation of document sources
 
-3. **Security**:
-   - Ensure API key rotation
-   - Implement proper access controls
-   - Consider data residency requirements for legal documents
+3. **Data Segregation**
+   - Isolation between different user contexts
+   - Jurisdiction-aware data handling
+
+## Conclusion
+
+The Legal RAG system architecture combines modern RAG techniques with domain-specific legal knowledge to create a powerful, accurate, and efficient legal research tool. The modular design allows for easy extension and customization while maintaining performance and reliability.

@@ -1,121 +1,100 @@
-# Jurisdiction Handling
+# Jurisdiction Handling in Legal RAG
 
-One of the key innovations of the Legal RAG System is its jurisdiction-aware search and ranking. This document explains how the system handles different jurisdictions and their relationships.
+This document explains how the Legal RAG system implements jurisdiction-aware document relevance scoring for legal research.
+
+## Overview
+
+Legal research is heavily dependent on jurisdiction hierarchies. Documents from the same jurisdiction as the query or from jurisdictions with higher precedential value should be ranked higher than others. The Legal RAG system incorporates this legal domain knowledge into its vector search algorithm.
 
 ## Jurisdiction Hierarchy
 
-The system represents the US legal jurisdiction hierarchy as follows:
+The system implements a jurisdiction hierarchy that models the U.S. legal system:
 
 ```
-┌────────────┐
-│ US Supreme │
-│   Court    │
-└─────┬──────┘
-      │
-┌─────▼──────┐
-│  Federal   │
-│   Courts   │
-└──┬──┬──┬───┘
-   │  │  │
-┌──▼┐┌▼┐┌▼──┐
-│1st││..││9th│ Circuit Courts
-└┬──┘└─┘└┬──┘
- │      │
-┌▼──┐  ┌▼─┐
-│ME │  │CA │ State Courts
-└───┘  └┬─┘
-        │
-      ┌─▼───┐
-      │CA   │
-      │Sup. │ State Supreme Courts
-      └─────┘
+                  US-SCOTUS (Supreme Court)
+                        |
+            +-----------+-----------+
+            |           |           |
+         US-1CIR     US-2CIR  ... US-13CIR (Federal Circuit Courts)
+            |           |           |
+         Multiple    Multiple    Multiple
+         District    District    District
+         Courts      Courts      Courts
+            |           |           |
+        +---+---+   +---+---+   +---+---+
+        |       |   |       |   |       |
+    State X   State Y   State Z   ...   (State Courts)
+        |       |       |
+    State X   State Y   State Z
+    Courts    Courts    Courts
 ```
 
 ## Jurisdiction Codes
 
-The system uses the following jurisdiction code format:
+The system uses a standardized format for jurisdiction codes:
 
-- **US-SCOTUS**: US Supreme Court
-- **US-FED**: US Federal Courts (generic)
-- **US-[N]CIR**: US Circuit Courts (e.g., US-9CIR for 9th Circuit)
-- **[STATE]**: State courts (e.g., CA for California)
-- **[STATE]-SUP**: State Supreme Courts (e.g., CA-SUP for California Supreme Court)
-- **[STATE]-APP**: State Appellate Courts (e.g., CA-APP for California Court of Appeal)
+- `US-SCOTUS`: U.S. Supreme Court
+- `US-FED`: Federal law (generally)
+- `US-nCIR`: Federal Circuit Courts (where n = 1-13)
+- `US-DC-{district}`: Federal District Courts
+- `{STATE}-SUP`: State Supreme Courts (e.g., `CA-SUP` for California Supreme Court)
+- `{STATE}-APP`: State Appellate Courts
+- `{STATE}-DIST`: State District/Trial Courts
 
-## Jurisdiction Boosting
+## Jurisdiction Boost Algorithm
 
-When searching for documents, the system applies a jurisdiction-based boosting factor:
+When retrieving documents, the system applies a boost factor based on jurisdictional relationships:
 
-1. **Direct Match**: A document from the exact jurisdiction gets highest boost (2.0)
-2. **Hierarchical Match**: Documents from jurisdictions in the same hierarchy get a boost proportional to their relationship
-3. **Circuit/State Relationship**: Documents from a state's circuit or vice versa get a moderate boost
-4. **Non-Related**: Documents from unrelated jurisdictions get a slight penalty
+1. **Exact Match Boost**: Documents from the exact jurisdiction get a 1.0 (no modification) boost
+2. **Superior Jurisdiction Boost**: Documents from jurisdictions that have direct precedential value over the query jurisdiction (e.g., US Supreme Court decisions for a California query) receive a boost of 0.9-0.95
+3. **Related Jurisdiction Boost**: Documents from similar or neighboring jurisdictions (e.g., other Circuit Courts for a Circuit Court query) receive a boost of 0.7-0.8
+4. **Unrelated Jurisdiction Penalty**: Documents from jurisdictions with no direct precedential value receive a factor of 0.5-0.6
 
-### Example
+## Implementation
 
-For a query with jurisdiction `CA-9` (California in 9th Circuit):
+The jurisdiction boost is implemented in two key components:
 
-- Document from `CA`: boost = 1.25 (direct state match)
-- Document from `CA-SUP`: boost = 1.75 (state supreme court)
-- Document from `US-9CIR`: boost = 1.5 (circuit court match)
-- Document from `US-SCOTUS`: boost = 2.0 (always highest)
-- Document from `NY`: boost = 0.75 (unrelated state)
+1. **Jurisdiction Module**: Defines the hierarchy and provides functions to calculate boosts
+2. **Vector Search**: Incorporates boost factors when ranking document relevance
+
+### Example Calculation
+
+For a query in the `CA-9` jurisdiction (Northern California, 9th Circuit):
+
+```
+Document 1: US-SCOTUS, base similarity 0.85
+  → Final score: 0.85 × 0.95 (superior) = 0.8075
+
+Document 2: US-9CIR, base similarity 0.8
+  → Final score: 0.8 × 0.9 (direct parent) = 0.72
+
+Document 3: CA-SUP, base similarity 0.75
+  → Final score: 0.75 × 0.85 (state authority) = 0.6375
+
+Document 4: NY-SUP, base similarity 0.72
+  → Final score: 0.72 × 0.6 (unrelated) = 0.432
+```
+
+In this example, Document 1 would be ranked highest despite Document 2 being more directly relevant to the jurisdiction, because the Supreme Court has higher precedential value and the base similarity is higher.
 
 ## Citation Network Analysis
 
-Beyond simple jurisdictional relationships, the system can also incorporate citation network analysis:
+Beyond the formal jurisdiction hierarchy, the system also considers the citation network:
 
-1. **Citation Count**: Documents cited more frequently receive a higher precedential value
-2. **Citation Direction**: Documents that cite relevant cases receive a smaller boost
-3. **Citation Age**: More recent citations may receive higher weight
+1. **Citation Count**: Documents cited more frequently receive higher scores
+2. **Recent Citations**: More recent citations carry more weight
+3. **Citation by Authoritative Sources**: Citations from higher courts have more impact
 
-## Configuration
+This provides a more nuanced view of precedential value beyond the formal hierarchy.
 
-When initializing the Legal RAG System, you can specify the jurisdiction:
+## Customization
 
-```hy
-(setv rag-system (LegalRAGSystem :jurisdiction "CA-9"))
-```
+The jurisdiction system can be configured to handle different legal systems:
 
-This sets the default jurisdiction for all queries. You can also override it for specific queries:
+1. **Custom Hierarchies**: Define new jurisdiction relationships
+2. **Jurisdiction-Specific Prompts**: Modify context formation based on jurisdiction
+3. **Boosting Factors**: Adjust the weights applied to different jurisdictional relationships
 
-```hy
-(setv response (rag-system.query query :jurisdiction "NY-2"))
-```
+## Conclusion
 
-## Customizing Jurisdiction Hierarchy
-
-To add or modify jurisdictions, you can edit the `JURISDICTIONS` dictionary in `jurisdiction.hy`:
-
-```hy
-(setv JURISDICTIONS
-      {"US-FED" {"rank" 10
-                "description" "US Federal"
-                "circuits" ["US-1CIR" "US-2CIR"]}
-       ;; Add your custom jurisdictions here
-       "CUSTOM-J" {"rank" 20
-                  "description" "Custom Jurisdiction"
-                  "parent" "US-FED"}})
-```
-
-## International Jurisdictions
-
-While the current implementation focuses on US jurisdictions, the system is designed to be extensible for international use. To add international jurisdictions, follow the same pattern:
-
-```hy
-;; Example for adding UK jurisdictions
-(setv JURISDICTIONS
-      {;; Existing US jurisdictions...
-       
-       "UK" {"rank" 10
-            "description" "United Kingdom"
-            "children" ["UK-ENG" "UK-SCT" "UK-NIR" "UK-WLS"]}
-       
-       "UK-ENG" {"rank" 25
-                "description" "England and Wales"
-                "parent" "UK"}
-       
-       "UK-SCT" {"rank" 25
-                "description" "Scotland"
-                "parent" "UK"}})
-```
+The jurisdiction-aware approach ensures that legal research results respect the hierarchical nature of legal precedent, providing more accurate and relevant information to users working in specific jurisdictions.
