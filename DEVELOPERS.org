@@ -1,360 +1,151 @@
-#+TITLE: Developer Setup Guide
+#+TITLE: Legal RAG System Developer Guide
 #+AUTHOR: DefRecord Team
 #+EMAIL: info@defrecord.com
 #+DATE: 2025-03-23
-#+DESCRIPTION: Setup guide for Legal RAG development across different operating systems
+#+DESCRIPTION: Guide for developers working on the Legal RAG system
 
-* Setting Up the Legal RAG Development Environment
+* Developer Guide
 
-This guide provides detailed setup instructions for developers working on the Legal RAG system across different operating systems.
+This guide provides information for developers working on the Legal RAG system.
 
-** Quick Start
+** Getting Started
 
-For a quick start on any platform with ~uv~ installed:
+*** Prerequisites
 
-#+begin_src bash
-# Clone the repository
-git clone https://github.com/defrecord/legal-rag-hy.git
-cd legal-rag-hy
+- Python 3.9 or newer
+- Hy 0.26.0 or newer
+- Emacs for literate programming (highly recommended)
+- Git
 
-# Create and activate a virtual environment with uv
-uv venv
-source .venv/bin/activate  # On Unix/macOS
-# Or: .venv\Scripts\activate  # On Windows
+*** Installation
 
-# Install dependencies with uv
-uv pip install -e .
-#+end_src
+1. Clone the repository:
+   #+begin_src bash
+   git clone https://github.com/defrecord/legal-rag-hy.git
+   cd legal-rag-hy
+   #+end_src
 
-** Installing uv
+2. Set up a development environment:
+   #+begin_src bash
+   # Using UV (recommended)
+   uv pip install -e ".[dev]"
+   
+   # Using pip
+   pip install -e ".[dev]"
+   #+end_src
 
-~uv~ is a Python packaging tool that is significantly faster than pip and provides better dependency resolution. Installing it is recommended for all development environments.
+3. Tangle code from org files:
+   #+begin_src bash
+   make tangle
+   #+end_src
 
-*** Linux
+** Development Workflow
 
-#+begin_src bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-#+end_src
+*** Literate Programming
 
-Or with pip:
+This project uses org-mode literate programming. See [[file:docs/DEVELOPERS/org-mode-guide.org][Org-Mode Development Guide]] for detailed instructions.
 
-#+begin_src bash
-pip install uv
-#+end_src
-
-*** macOS
-
-#+begin_src bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-#+end_src
-
-With Homebrew:
+*** Building
 
 #+begin_src bash
-brew install uv
-#+end_src
+# Tangle code from org files
+make tangle
 
-*** FreeBSD
-
-#+begin_src bash
-pkg install py39-uv
-#+end_src
-
-Or using pip:
-
-#+begin_src bash
-pip install uv
-#+end_src
-
-*** Windows
-
-Using PowerShell:
-
-#+begin_src powershell
-iwr -useb https://astral.sh/uv/install.ps1 | iex
-#+end_src
-
-** Detailed Setup by Operating System
-
-*** Linux Setup
-
-**** Prerequisites
-
-#+begin_src bash
-# Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install -y build-essential python3-dev python3-pip git
-
-# RHEL/Fedora
-sudo dnf install -y gcc gcc-c++ python3-devel python3-pip git
-#+end_src
-
-**** Environment Setup
-
-#+begin_src bash
-# Clone the repository
-git clone https://github.com/defrecord/legal-rag-hy.git
-cd legal-rag-hy
-
-# Set up environment with uv
-uv venv
-source .venv/bin/activate
-
-# Install dependencies
-uv pip install -e ".[dev]"
-
-# Verify installation
-hy -c "(print \"Legal RAG setup successful!\")"
-#+end_src
-
-*** macOS Setup
-
-**** Prerequisites
-
-#+begin_src bash
-# Install Homebrew if not already installed
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install required packages
-brew install python3 git hy
-#+end_src
-
-**** Environment Setup
-
-#+begin_src bash
-# Clone the repository
-git clone https://github.com/defrecord/legal-rag-hy.git
-cd legal-rag-hy
-
-# Set up environment with uv
-uv venv
-source .venv/bin/activate
-
-# Install dependencies
-uv pip install -e ".[dev]"
-
-# Verify installation
-hy -c "(print \"Legal RAG setup successful!\")"
-#+end_src
-
-*** FreeBSD Setup
-
-**** Prerequisites
-
-#+begin_src bash
-# Install required packages
-sudo pkg install -y python39 py39-pip git hy
-
-# Set Python 3.9 as default (if needed)
-sudo ln -sf /usr/local/bin/python3.9 /usr/local/bin/python
-sudo ln -sf /usr/local/bin/pip3.9 /usr/local/bin/pip
-#+end_src
-
-**** Environment Setup
-
-#+begin_src bash
-# Clone the repository
-git clone https://github.com/defrecord/legal-rag-hy.git
-cd legal-rag-hy
-
-# Set up environment with uv
-uv venv
-source .venv/bin/activate
-
-# Install dependencies
-uv pip install -e ".[dev]"
-
-# Verify installation
-hy -c "(print \"Legal RAG setup successful!\")"
-#+end_src
-
-*** Windows Setup
-
-**** Prerequisites
-
-- Install Python 3.9+ from https://www.python.org/downloads/
-- Install Git from https://git-scm.com/download/win
-
-**** Environment Setup
-
-In PowerShell:
-
-#+begin_src powershell
-# Clone the repository
-git clone https://github.com/defrecord/legal-rag-hy.git
-cd legal-rag-hy
-
-# Set up environment with uv
-uv venv
-.\.venv\Scripts\activate
-
-# Install dependencies
-uv pip install -e ".[dev]"
-
-# Verify installation
-hy -c "(print \"Legal RAG setup successful!\")"
-#+end_src
-
-** Development Tools
-
-The repository includes several development tools to help maintain code quality and consistency:
-
-*** Running Tests
-
-#+begin_src bash
 # Run tests
-pytest
+make test
 
 # Run tests with coverage
-pytest --cov=legal_rag tests/
+make coverage
 #+end_src
 
-*** Code Formatting
+*** Linting and Formatting
 
 #+begin_src bash
-# Format code with black
-black src/ tests/
-
-# Sort imports with isort
-isort src/ tests/
-#+end_src
-
-*** Linting
-
-#+begin_src bash
-# Run linting
+# Run linters
 make lint
+
+# Apply formatting
+make format
 #+end_src
 
-*** Documentation Generation
+*** Documentation
 
 #+begin_src bash
 # Generate documentation
 make docs
+
+# Generate citation file
+make citation
 #+end_src
 
-** Org Mode Development
+** Project Structure
 
-This project uses Org mode literate programming for documentation and code. Here's how to set up Emacs for optimal development:
+- =src/legal_rag.org=: Main literate programming file
+- =src/legal_rag/=: Generated Hy files
+  - =system.hy=: Core RAG implementation
+  - =cache.hy=: Embedding cache with TTL
+  - =citation.hy=: Citation handling
+  - =jurisdiction.hy=: Jurisdiction hierarchy
+  - =evaluation.hy=: Response evaluation
+  - =utils.hy=: Helper utilities
+- =tests/=: Test files
+- =docs/=: Documentation
+- =examples/=: Usage examples
 
-*** Emacs Setup
+** Key Components
 
-**** Install Emacs
+*** Core System
 
-***** Linux (Ubuntu/Debian)
-#+begin_src bash
-sudo apt-get install emacs
-#+end_src
+The core RAG implementation (=system.hy=) provides:
 
-***** macOS
-#+begin_src bash
-brew install emacs
-#+end_src
+- Vector search with jurisdiction-aware boosting
+- Context formation for LLMs
+- Answer generation with citations
+- Evaluation of response quality
 
-***** FreeBSD
-#+begin_src bash
-pkg install emacs
-#+end_src
+*** Embedding Cache
 
-**** Install Required Emacs Packages
+The caching system (=cache.hy=) provides:
 
-Add this to your ~.emacs~ or ~init.el~ file:
+- TTL-based expiration
+- Version tracking
+- Persistent storage
+- Memory management
 
-#+begin_src emacs-lisp
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(package-initialize)
+*** Jurisdiction Handling
 
-(unless package-archive-contents
-  (package-refresh-contents))
+The jurisdiction system (=jurisdiction.hy=) implements:
 
-(dolist (package '(hy-mode org-babel-hy paredit rainbow-delimiters))
-  (unless (package-installed-p package)
-    (package-install package)))
+- Legal jurisdiction hierarchy
+- Precedential boost calculations
+- Citation network analysis
 
-;; Configure org-babel for Hy
-(with-eval-after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((hy . t)
-     (python . t)
-     (shell . t))))
+** Git Workflow
 
-;; Auto-enable hy-mode for .hy files
-(add-to-list 'auto-mode-alist '("\\.hy\\'" . hy-mode))
-#+end_src
+*** Commit Guidelines
 
-*** Using Org Mode with the Project
+1. Follow conventional commits format:
+   #+begin_example
+   <type>(<scope>): <description>
+   #+end_example
 
-1. Open any ~.org~ file in the project with Emacs
-2. Use ~C-c C-c~ to execute code blocks in place
-3. Use ~C-c C-v t~ to tangle code blocks (extract code to source files)
-4. Use ~C-c C-v e~ to export the document to various formats
+2. Use the git-commit-with-trailers script:
+   #+begin_src bash
+   ./scripts/git-commit-with-trailers.sh "feat(component): your commit message"
+   #+end_src
 
-** Troubleshooting
+*** Pull Requests
 
-*** Common Issues
+1. Create a feature branch
+2. Implement your changes
+3. Run tests and linters
+4. Submit a PR with clear description
 
-**** Missing Python.h
+** Detailed Documentation
 
-If you encounter a "Python.h: No such file or directory" error:
+For more detailed information, see:
 
-#+begin_src bash
-# Ubuntu/Debian
-sudo apt-get install python3-dev
-
-# RHEL/Fedora
-sudo dnf install python3-devel
-
-# FreeBSD
-pkg install python39-dev
-#+end_src
-
-**** Hy Import Issues
-
-If you have issues importing Hy modules:
-
-#+begin_src bash
-# Verify hy installation
-hy --version
-
-# Check if the package is installed correctly
-uv pip list | grep hy
-#+end_src
-
-**** FAISS Installation Issues
-
-FAISS may require specific build dependencies:
-
-#+begin_src bash
-# Ubuntu/Debian
-sudo apt-get install libomp-dev
-
-# macOS
-brew install libomp
-
-# Then reinstall FAISS
-uv pip uninstall faiss-cpu
-uv pip install faiss-cpu
-#+end_src
-
-** Performance Recommendations
-
-For optimal performance, especially with large document collections:
-
-*** Linux
-- Use a recent kernel (5.10+) for better file system performance
-- Consider using PyPy for non-vector operations
-
-*** macOS
-- Enable spotlight indexing exclusion for data directories
-- Use macOS 12 (Monterey) or newer for better Python performance
-
-*** FreeBSD
-- Use ZFS for storage with appropriate ARC sizing
-- Set resource limits appropriately for large indexes
-
-*** All Platforms
-- Use at least 16GB RAM for production use
-- Install FAISS with GPU support if available
-- Use SSD storage for vector database files
+- [[file:CONTRIBUTING.org][Contributing Guide]]
+- [[file:docs/DEVELOPERS/org-mode-guide.org][Org-Mode Development Guide]]
+- [[file:docs/architecture.org][System Architecture]]
+- [[file:docs/jurisdiction.org][Jurisdiction Handling]]

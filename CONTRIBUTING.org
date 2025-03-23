@@ -109,9 +109,31 @@ Update documentation when you make changes:
 4. Request a review from a maintainer
 5. Address any feedback from the code review
 
-** Literate Programming Workflow
+** Literate Programming
 
-We use org-mode literate programming to maintain code and documentation together with full round-trip editing support:
+This project uses org-mode literate programming to maintain code and documentation as a unified whole with full round-trip editing support:
+
+- All implementation is in org files that tangle to Hy code
+- Direct modifications to Hy files can be synced back to org files
+- Code and documentation stay in sync through the entire development cycle
+
+*** Tangling (org → hy)
+
+Extract code blocks from org files to generate Hy implementation files:
+
+#+begin_src bash
+make tangle
+#+end_src
+
+*** Detangling (hy → org)
+
+Sync changes from modified Hy files back to their source org files:
+
+#+begin_src bash
+make detangle
+#+end_src
+
+*** Development Workflow
 
 1. Main implementation is in =src/legal_rag.org=
 2. Edit the org file to modify both code and documentation
@@ -127,6 +149,7 @@ We use org-mode literate programming to maintain code and documentation together
    #+begin_src bash
    make detangle
    #+end_src
+6. Commit changes to org files as the authoritative source
 
 *** Literate Programming Best Practices
 
@@ -151,6 +174,10 @@ When creating or editing org-mode files with code blocks:
 3. Organize org files with clear section structure using headings
 
 4. Always commit the org files as the authoritative source, not just the generated code
+
+*** Examples
+
+See [[file:../examples/round_trip_example.org][round_trip_example.org]] for a practical example of the literate programming workflow.
 
 ** Feature Requests and Bug Reports
 

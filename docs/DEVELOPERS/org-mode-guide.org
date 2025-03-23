@@ -1,0 +1,214 @@
+#+TITLE: Org-Mode Development Guide for Legal RAG
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Detailed guide for developers using org-mode with the Legal RAG system
+
+* Org-Mode Development Guide
+
+This guide provides detailed information for developers working with the org-mode literate programming approach used in the Legal RAG system.
+
+** Introduction to Literate Programming
+
+Literate programming (coined by Donald Knuth) is an approach to programming where code and documentation are written together in a single document, with the primary focus on human readability. Org-mode provides excellent support for this approach through its Babel capabilities.
+
+** Setting Up Your Environment
+
+*** Required Tools
+
+1. *Emacs*: The primary editor for org-mode files
+   #+begin_src bash
+   # Ubuntu/Debian
+   sudo apt install emacs
+   
+   # macOS
+   brew install emacs
+   
+   # FreeBSD
+   pkg install emacs
+   #+end_src
+
+2. *Org-mode*: Typically comes with Emacs, but ensure you have a recent version
+   #+begin_src emacs-lisp
+   ;; In your Emacs config
+   (require 'org)
+   (require 'ob-hy)  ; For Hy language support
+   #+end_src
+
+3. *Hy*: The Lisp dialect used for implementation
+   #+begin_src bash
+   uv pip install hy
+   #+end_src
+
+*** Emacs Configuration
+
+For an optimal development experience, add these to your Emacs config:
+
+#+begin_src emacs-lisp
+;; Enable org-babel for Hy
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (hy . t)
+   (python . t)
+   (shell . t)))
+
+;; Don't prompt before executing code blocks
+(setq org-confirm-babel-evaluate nil)
+
+;; Preserve indentation in code blocks
+(setq org-src-preserve-indentation t)
+
+;; Add key bindings
+(global-set-key (kbd "C-c C-v t") 'org-babel-tangle)
+(global-set-key (kbd "C-c C-v d") 'org-babel-detangle)
+#+end_src
+
+** Tangling and Detangling
+
+*** Tangling (org → code)
+
+Tangling extracts code blocks from org files into source code files.
+
+**** Using Emacs:
+
+1. Open the org file
+2. Position cursor in the code block
+3. Press ~C-c C-v t~ to tangle the current block
+4. Or use ~M-x org-babel-tangle~ to tangle the entire file
+
+**** Using Make:
+
+#+begin_src bash
+make tangle
+#+end_src
+
+*** Detangling (code → org)
+
+Detangling syncs changes from source files back to the org file.
+
+**** Using Emacs:
+
+1. Open the org file
+2. Run ~M-x org-babel-detangle~ with the source file open
+
+**** Using Make:
+
+#+begin_src bash
+make detangle
+#+end_src
+
+** Code Block Structure
+
+*** Basic Structure
+
+#+begin_example
+#+begin_src hy :tangle path/to/output.hy
+(defn example-function []
+  "This is an example function")
+#+end_src
+#+end_example
+
+*** Common Header Arguments
+
+| Argument        | Description                                   | Example                         |
+|-----------------+-----------------------------------------------+---------------------------------|
+| :tangle         | Output file path (relative to the org file)   | :tangle src/legal_rag/file.hy  |
+| :noweb          | Enable template expansion with <<name>>       | :noweb yes                      |
+| :exports        | Control what is exported to HTML/PDF          | :exports code                   |
+| :results        | Format for results when executing             | :results output                 |
+| :mkdirp         | Create directories in tangle paths if needed  | :mkdirp yes                     |
+| :comments       | How to handle comments                        | :comments link                  |
+| :padline        | Whether to ensure blank padding lines         | :padline no                     |
+
+*** Noweb References
+
+You can use noweb references to create templates:
+
+#+begin_example
+#+name: common-imports
+#+begin_src hy :tangle no
+(import
+  os
+  json
+  [datetime [datetime]])
+#+end_src
+
+#+begin_src hy :tangle src/module.hy :noweb yes
+;; Import common libraries
+<<common-imports>>
+
+;; Additional code here
+#+end_src
+#+end_example
+
+*** Using Drawer Properties for File-Wide Settings
+
+#+begin_example
+* Component Name
+:PROPERTIES:
+:header-args:hy: :tangle src/legal_rag/component.hy :padline no
+:END:
+
+All code blocks in this section inherit these settings
+#+end_example
+
+** Best Practices
+
+*** Organization
+
+1. *Use Clear Section Structure*
+   - Organize code logically with hierarchical headings
+   - Group related functionality together
+
+2. *Document Everything*
+   - Add explanations before code blocks
+   - Describe the "why" not just the "what"
+   - Include examples where appropriate
+
+3. *Consistent Naming*
+   - Use consistent naming for sections and code blocks
+   - Match file names to their functionality
+
+*** Workflow Recommendations
+
+1. *Always Edit the Org File First*
+   - Make most changes directly in the org file
+   - Use detangling only for minor edits to generated code
+
+2. *Version Control*
+   - Commit both org files and generated code
+   - Consider the org files as the authoritative source
+   - Include tangle/detangle in your pre-commit hook
+
+3. *Testing*
+   - Write tests against the generated code
+   - Consider using org-mode's inline testing capabilities
+
+4. *Code Review*
+   - Review org files, not just the generated code
+   - Look for documentation gaps or inconsistencies
+
+** Examples
+
+See [[file:../../examples/round_trip_example.org][round_trip_example.org]] for a practical example.
+
+** Troubleshooting
+
+*** Tangling Issues
+
+- *Problem*: Code block not being tangled
+  - *Solution*: Check the tangle header argument is correct
+  - *Solution*: Ensure the file path is valid
+
+- *Problem*: Missing directories
+  - *Solution*: Add :mkdirp yes to header arguments
+
+*** Detangling Issues
+
+- *Problem*: Changes not being synced back
+  - *Solution*: Check for properly formatted reference markers
+  - *Solution*: Ensure you have preserved the structure of the file
+
+- *Problem*: Error about missing references
+  - *Solution*: Ensure the org file is in the same state as when it was tangled
