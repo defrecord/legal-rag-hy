@@ -1,0 +1,360 @@
+#+TITLE: Developer Setup Guide
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Setup guide for Legal RAG development across different operating systems
+
+* Setting Up the Legal RAG Development Environment
+
+This guide provides detailed setup instructions for developers working on the Legal RAG system across different operating systems.
+
+** Quick Start
+
+For a quick start on any platform with ~uv~ installed:
+
+#+begin_src bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Create and activate a virtual environment with uv
+uv venv
+source .venv/bin/activate  # On Unix/macOS
+# Or: .venv\Scripts\activate  # On Windows
+
+# Install dependencies with uv
+uv pip install -e .
+#+end_src
+
+** Installing uv
+
+~uv~ is a Python packaging tool that is significantly faster than pip and provides better dependency resolution. Installing it is recommended for all development environments.
+
+*** Linux
+
+#+begin_src bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+#+end_src
+
+Or with pip:
+
+#+begin_src bash
+pip install uv
+#+end_src
+
+*** macOS
+
+#+begin_src bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+#+end_src
+
+With Homebrew:
+
+#+begin_src bash
+brew install uv
+#+end_src
+
+*** FreeBSD
+
+#+begin_src bash
+pkg install py39-uv
+#+end_src
+
+Or using pip:
+
+#+begin_src bash
+pip install uv
+#+end_src
+
+*** Windows
+
+Using PowerShell:
+
+#+begin_src powershell
+iwr -useb https://astral.sh/uv/install.ps1 | iex
+#+end_src
+
+** Detailed Setup by Operating System
+
+*** Linux Setup
+
+**** Prerequisites
+
+#+begin_src bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y build-essential python3-dev python3-pip git
+
+# RHEL/Fedora
+sudo dnf install -y gcc gcc-c++ python3-devel python3-pip git
+#+end_src
+
+**** Environment Setup
+
+#+begin_src bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Set up environment with uv
+uv venv
+source .venv/bin/activate
+
+# Install dependencies
+uv pip install -e ".[dev]"
+
+# Verify installation
+hy -c "(print \"Legal RAG setup successful!\")"
+#+end_src
+
+*** macOS Setup
+
+**** Prerequisites
+
+#+begin_src bash
+# Install Homebrew if not already installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install required packages
+brew install python3 git hy
+#+end_src
+
+**** Environment Setup
+
+#+begin_src bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Set up environment with uv
+uv venv
+source .venv/bin/activate
+
+# Install dependencies
+uv pip install -e ".[dev]"
+
+# Verify installation
+hy -c "(print \"Legal RAG setup successful!\")"
+#+end_src
+
+*** FreeBSD Setup
+
+**** Prerequisites
+
+#+begin_src bash
+# Install required packages
+sudo pkg install -y python39 py39-pip git hy
+
+# Set Python 3.9 as default (if needed)
+sudo ln -sf /usr/local/bin/python3.9 /usr/local/bin/python
+sudo ln -sf /usr/local/bin/pip3.9 /usr/local/bin/pip
+#+end_src
+
+**** Environment Setup
+
+#+begin_src bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Set up environment with uv
+uv venv
+source .venv/bin/activate
+
+# Install dependencies
+uv pip install -e ".[dev]"
+
+# Verify installation
+hy -c "(print \"Legal RAG setup successful!\")"
+#+end_src
+
+*** Windows Setup
+
+**** Prerequisites
+
+- Install Python 3.9+ from https://www.python.org/downloads/
+- Install Git from https://git-scm.com/download/win
+
+**** Environment Setup
+
+In PowerShell:
+
+#+begin_src powershell
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Set up environment with uv
+uv venv
+.\.venv\Scripts\activate
+
+# Install dependencies
+uv pip install -e ".[dev]"
+
+# Verify installation
+hy -c "(print \"Legal RAG setup successful!\")"
+#+end_src
+
+** Development Tools
+
+The repository includes several development tools to help maintain code quality and consistency:
+
+*** Running Tests
+
+#+begin_src bash
+# Run tests
+pytest
+
+# Run tests with coverage
+pytest --cov=legal_rag tests/
+#+end_src
+
+*** Code Formatting
+
+#+begin_src bash
+# Format code with black
+black src/ tests/
+
+# Sort imports with isort
+isort src/ tests/
+#+end_src
+
+*** Linting
+
+#+begin_src bash
+# Run linting
+make lint
+#+end_src
+
+*** Documentation Generation
+
+#+begin_src bash
+# Generate documentation
+make docs
+#+end_src
+
+** Org Mode Development
+
+This project uses Org mode literate programming for documentation and code. Here's how to set up Emacs for optimal development:
+
+*** Emacs Setup
+
+**** Install Emacs
+
+***** Linux (Ubuntu/Debian)
+#+begin_src bash
+sudo apt-get install emacs
+#+end_src
+
+***** macOS
+#+begin_src bash
+brew install emacs
+#+end_src
+
+***** FreeBSD
+#+begin_src bash
+pkg install emacs
+#+end_src
+
+**** Install Required Emacs Packages
+
+Add this to your ~.emacs~ or ~init.el~ file:
+
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(dolist (package '(hy-mode org-babel-hy paredit rainbow-delimiters))
+  (unless (package-installed-p package)
+    (package-install package)))
+
+;; Configure org-babel for Hy
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((hy . t)
+     (python . t)
+     (shell . t))))
+
+;; Auto-enable hy-mode for .hy files
+(add-to-list 'auto-mode-alist '("\\.hy\\'" . hy-mode))
+#+end_src
+
+*** Using Org Mode with the Project
+
+1. Open any ~.org~ file in the project with Emacs
+2. Use ~C-c C-c~ to execute code blocks in place
+3. Use ~C-c C-v t~ to tangle code blocks (extract code to source files)
+4. Use ~C-c C-v e~ to export the document to various formats
+
+** Troubleshooting
+
+*** Common Issues
+
+**** Missing Python.h
+
+If you encounter a "Python.h: No such file or directory" error:
+
+#+begin_src bash
+# Ubuntu/Debian
+sudo apt-get install python3-dev
+
+# RHEL/Fedora
+sudo dnf install python3-devel
+
+# FreeBSD
+pkg install python39-dev
+#+end_src
+
+**** Hy Import Issues
+
+If you have issues importing Hy modules:
+
+#+begin_src bash
+# Verify hy installation
+hy --version
+
+# Check if the package is installed correctly
+uv pip list | grep hy
+#+end_src
+
+**** FAISS Installation Issues
+
+FAISS may require specific build dependencies:
+
+#+begin_src bash
+# Ubuntu/Debian
+sudo apt-get install libomp-dev
+
+# macOS
+brew install libomp
+
+# Then reinstall FAISS
+uv pip uninstall faiss-cpu
+uv pip install faiss-cpu
+#+end_src
+
+** Performance Recommendations
+
+For optimal performance, especially with large document collections:
+
+*** Linux
+- Use a recent kernel (5.10+) for better file system performance
+- Consider using PyPy for non-vector operations
+
+*** macOS
+- Enable spotlight indexing exclusion for data directories
+- Use macOS 12 (Monterey) or newer for better Python performance
+
+*** FreeBSD
+- Use ZFS for storage with appropriate ARC sizing
+- Set resource limits appropriately for large indexes
+
+*** All Platforms
+- Use at least 16GB RAM for production use
+- Install FAISS with GPU support if available
+- Use SSD storage for vector database files

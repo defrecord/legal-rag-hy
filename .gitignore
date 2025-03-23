@@ -1,0 +1,50 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.hy~
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.hypothesis/
+
+# Documentation
+docs/_build/
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Cache files
+src/legal_rag/cache/
+*.pkl
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Local configuration
+.env
+.env.*
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb

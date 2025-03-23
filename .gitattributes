@@ -1,0 +1,18 @@
+# Ensure org files are properly handled
+*.org linguist-language=Org
+*.org linguist-documentation=false
+
+# Treat generated Hy files as code
+*.hy linguist-language=Hy
+*.hy linguist-generated=false
+
+# Handle specific file types
+*.md linguist-documentation=true 
+*.txt linguist-documentation=true
+LICENSE linguist-documentation=true
+*.png linguist-documentation=true
+
+# Ensure correct line endings
+* text=auto eol=lf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf

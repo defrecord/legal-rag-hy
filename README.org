@@ -1,0 +1,116 @@
+#+TITLE: Legal RAG System with Hy
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: A jurisdiction-aware Retrieval-Augmented Generation system for legal research built with Hy and org-mode literate programming
+
+* Legal RAG System with Hy
+
+This repository contains a production-ready Retrieval-Augmented Generation (RAG) system specifically designed for legal research, implemented using Hy (a Lisp dialect embedded in Python).
+
+** Overview
+
+The Legal RAG System provides an efficient, accurate, and jurisdiction-aware approach to legal research by:
+
+- Retrieving relevant legal documents from a vector database based on queries
+- Enhancing document relevance with jurisdiction-aware scoring
+- Generating accurate, well-cited answers using LLMs
+- Providing an efficient embedding cache with TTL to reduce API costs
+- Supporting multiple document types (cases, statutes, regulations)
+
+** Features
+
+- *Jurisdiction-Aware Retrieval*: Boosts relevance based on jurisdictional hierarchy
+- *Citation Network Analysis*: Weights documents by citation relationships
+- *Embedding Cache*: TTL-based caching with version tracking
+- *Failure Handling*: Graceful degradation with fallbacks
+- *Evaluation Framework*: Comprehensive metrics for RAG performance
+- *Optimized Vector Search*: Efficient similarity search with FAISS
+
+** Installation
+
+#+BEGIN_SRC bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Install dependencies
+pip install -e .
+#+END_SRC
+
+** Usage
+
+Basic usage example:
+
+#+BEGIN_SRC hy
+(import [legal-rag.system [LegalRAGSystem]])
+
+;; Initialize the system
+(setv rag-system (LegalRAGSystem 
+                   :embedding-model "text-embedding-3-large"
+                   :llm-model "gpt-4o"
+                   :jurisdiction "CA-9"))
+
+;; Query the system
+(setv query "What constitutes fair use under copyright law?")
+(setv response (rag-system.query query))
+
+;; Display the response with citations
+(print response.answer)
+(print "\nCitations:")
+(for [citation response.citations]
+  (print citation))
+#+END_SRC
+
+** Architecture
+
+The system is built with a modular architecture:
+
+1. *Query Processing*: Pre-processes legal queries for optimal retrieval
+2. *Vector Search*: Jurisdiction-aware document retrieval with FAISS
+3. *Context Formation*: Structures retrieved documents for the LLM
+4. *Answer Generation*: Produces accurate, well-cited responses
+5. *Embedding Cache*: Optimizes performance and reduces API costs
+6. *Evaluation Module*: Assesses system performance with multiple metrics
+
+** Documentation
+
+Detailed documentation is available in the =docs= directory:
+
+- [[file:docs/installation.md][Installation Guide]]
+- [[file:docs/usage.md][Usage Guide]]
+- [[file:docs/architecture.md][System Architecture]]
+- [[file:docs/evaluation.md][Evaluation Framework]]
+- [[file:docs/jurisdiction.md][Jurisdiction Handling]]
+- [[file:docs/deployment.md][Production Deployment Guide]]
+
+** Contributing
+
+Contributions are welcome! Please read our [[file:CONTRIBUTING.md][Contributing Guide]] for details on our code of conduct and the process for submitting pull requests.
+
+** License
+
+This project is licensed under the MIT License - see the [[file:LICENSE][LICENSE]] file for details.
+
+** Acknowledgments
+
+- The Hy community for the excellent Lisp dialect
+- FAISS developers for the efficient similarity search
+- LangChain contributors for inspiration
+- DefRecord team for domain expertise
+
+** Contributors
+
+- [[https://github.com/kkumar30][Kushagra Kumar]] - Lead Developer, ML Systems
+- [[https://github.com/jwalsh][Jason Walsh]] - Project Lead, System Architecture
+- [[https://github.com/daidaitaotao][Xianglong Tao]] - Developer, Testing Infrastructure
+- [[https://github.com/aygp-dr][Aidan Pace]] - Developer, Infrastructure Integration
+- [[https://github.com/seanjensengrey][Sean Jensen-Grey]] - Research Advisor
+
+** Citation
+
+If you use this system in your research, please cite:
+
+#+BEGIN_SRC
+Kumar, K., Walsh, J., Tao, X., & Pace, A. (2025). Legal RAG: A Jurisdiction-Aware Retrieval-Augmented Generation System for Legal Research. In Proceedings of LITCon 2025.
+#+END_SRC
