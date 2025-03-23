@@ -84,6 +84,12 @@ Detailed documentation is available in the =docs= directory:
 - [[file:docs/jurisdiction.md][Jurisdiction Handling]]
 - [[file:docs/deployment.md][Production Deployment Guide]]
 
+** Examples
+
+Interactive examples are available in the =examples= directory:
+
+- [[file:examples/legal_rag_demo.ipynb][Legal RAG Demo Notebook]] - Demonstrates the system with visualizations
+
 ** Contributing
 
 Contributions are welcome! Please read our [[file:CONTRIBUTING.md][Contributing Guide]] for details on our code of conduct and the process for submitting pull requests.
