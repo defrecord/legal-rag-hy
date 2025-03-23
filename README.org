@@ -4,14 +4,12 @@
 #+DATE: 2025-03-23
 #+DESCRIPTION: A jurisdiction-aware Retrieval-Augmented Generation system for legal research built with Hy and org-mode literate programming
 
-* Legal RAG System with Hy
-
 [[https://github.com/defrecord/legal-rag-hy/actions/workflows/ci.yml/badge.svg][https://github.com/defrecord/legal-rag-hy/actions/workflows/ci.yml/badge.svg]]
 [[https://img.shields.io/github/v/release/defrecord/legal-rag-hy][https://img.shields.io/github/v/release/defrecord/legal-rag-hy]]
 [[https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue.svg][https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11-blue.svg]]
 [[https://img.shields.io/badge/license-MIT-green.svg][https://img.shields.io/badge/license-MIT-green.svg]]
 
-This repository contains a production-ready Retrieval-Augmented Generation (RAG) system specifically designed for legal research, implemented using Hy (a Lisp dialect embedded in Python).
+A jurisdiction-aware Retrieval-Augmented Generation (RAG) system for legal research, built with Hy and org-mode literate programming.
 
 ** Overview
 
@@ -80,24 +78,47 @@ The system is built with a modular architecture:
 
 ** Documentation
 
-Detailed documentation is available in the =docs= directory:
+Comprehensive documentation with full literate programming support:
 
-- [[file:docs/installation.md][Installation Guide]]
-- [[file:docs/usage.md][Usage Guide]]
-- [[file:docs/architecture.md][System Architecture]]
-- [[file:docs/evaluation.md][Evaluation Framework]]
-- [[file:docs/jurisdiction.md][Jurisdiction Handling]]
-- [[file:docs/deployment.md][Production Deployment Guide]]
+- [[file:docs/installation.org][Installation Guide]]
+- [[file:docs/usage.org][Usage Guide]]
+- [[file:docs/architecture.org][System Architecture]]
+- [[file:docs/evaluation.org][Evaluation Framework]]
+- [[file:docs/jurisdiction.org][Jurisdiction Handling]]
+- [[file:docs/deployment.org][Production Deployment Guide]]
+
+Generate HTML documentation:
+#+begin_src bash
+make docs
+#+end_src
 
 ** Examples
 
-Interactive examples are available in the =examples= directory:
+Interactive examples with org-mode tangle/detangle support:
 
 - [[file:examples/legal_rag_demo.ipynb][Legal RAG Demo Notebook]] - Demonstrates the system with visualizations
 
+Run the examples:
+#+begin_src bash
+make notebook
+#+end_src
+
 ** Contributing
 
-Contributions are welcome! Please read our [[file:CONTRIBUTING.md][Contributing Guide]] for details on our code of conduct and the process for submitting pull requests.
+Contributions are welcome! Please read our [[file:CONTRIBUTING.org][Contributing Guide]] for details on our code of conduct and the process for submitting pull requests.
+
+** Literate Programming
+
+This project uses org-mode literate programming to maintain code and documentation as a unified whole:
+
+- All implementation is in org files that tangle to Hy code
+- Documentation is generated from the same source
+- Full round-trip editing support
+
+To tangle code from org files:
+#+begin_src bash
+make tangle
+#+end_src
 
 ** License
 

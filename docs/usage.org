@@ -1,0 +1,50 @@
+#+TITLE: Legal RAG System Usage Guide
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Usage instructions for the Legal RAG system
+
+* Usage Guide
+
+** Basic Usage
+
+The Legal RAG system can be used in Hy code as follows:
+
+#+begin_src hy
+(import [legal-rag.system [LegalRAGSystem]])
+
+;; Initialize the system
+(setv rag-system (LegalRAGSystem 
+                  :embedding-model "text-embedding-3-large"
+                  :llm-model "gpt-4o"
+                  :jurisdiction "CA-9"))
+
+;; Add documents
+(setv document-id (rag-system.add-document 
+                   {"text" "Example legal document..." 
+                    "metadata" {"jurisdiction" "US-SCOTUS"}}))
+
+;; Query the system
+(setv response (rag-system.query "What constitutes fair use under copyright law?"))
+
+;; Access the response components
+(print response.answer)
+(print response.citations)
+(print response.confidence)
+#+end_src
+
+** Interactive Demo
+
+Run the interactive demo application:
+
+#+begin_src bash
+make run-demo
+#+end_src
+
+** Jupyter Notebook
+
+Explore the system with the provided Jupyter notebook example:
+
+#+begin_src bash
+make notebook
+#+end_src

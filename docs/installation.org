@@ -1,0 +1,45 @@
+#+TITLE: Legal RAG System Installation Guide
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Installation instructions for the Legal RAG system
+
+* Installation Guide
+
+** Prerequisites
+
+- Python 3.9 or newer
+- Emacs for literate programming (optional but recommended)
+- Git
+
+** Quick Installation
+
+#+begin_src bash
+# Clone the repository
+git clone https://github.com/defrecord/legal-rag-hy.git
+cd legal-rag-hy
+
+# Install with UV (recommended)
+uv pip install -e .
+
+# Or with pip
+pip install -e .
+#+end_src
+
+** Development Installation
+
+#+begin_src bash
+# Install with development dependencies
+uv pip install -e ".[dev]"
+
+# Or with pip
+pip install -e ".[dev]"
+#+end_src
+
+** Environment Setup
+
+Create a .env file with your OpenAI API key:
+
+#+begin_src bash
+echo "OPENAI_API_KEY=your-api-key-here" > .env
+#+end_src

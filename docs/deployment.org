@@ -1,0 +1,85 @@
+#+TITLE: Legal RAG System Deployment Guide
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Production deployment guide for the Legal RAG system
+
+* Production Deployment Guide
+
+** Overview
+
+This guide outlines best practices for deploying the Legal RAG system in production environments.
+
+** Deployment Options
+
+*** Docker Deployment
+
+A Dockerfile is provided for containerized deployment:
+
+#+begin_src bash
+# Build the Docker image
+docker build -t legal-rag-hy .
+
+# Run the container
+docker run -p 8000:8000 \
+  -e OPENAI_API_KEY=your-api-key \
+  legal-rag-hy
+#+end_src
+
+*** API Server
+
+The system can be deployed as an API server using FastAPI:
+
+#+begin_src bash
+# Install server dependencies
+pip install ".[server]"
+
+# Run the server
+uvicorn legal_rag.server:app --host 0.0.0.0 --port 8000
+#+end_src
+
+*** Cloud Deployment
+
+Recommended cloud environments:
+
+1. *AWS*: Use Elastic Container Service or Lambda
+2. *GCP*: Cloud Run or Cloud Functions
+3. *Azure*: Container Instances or Functions
+
+** Performance Optimization
+
+*** Embedding Cache Persistence
+
+For production, configure persistent cache storage:
+
+#+begin_src hy
+(setv rag-system (LegalRAGSystem
+                  :embedding-model "text-embedding-3-large"
+                  :use-cache True
+                  :cache-ttl 604800  ;; 1 week
+                  :cache-dir "/path/to/persistent/cache"))
+#+end_src
+
+*** Vector Database Options
+
+For large-scale deployments, consider alternative vector database backends:
+
+1. *Pinecone*: Cloud-hosted vector database with automatic scaling
+2. *Milvus*: Open-source vector database for large-scale deployments
+3. *Redis*: With RedisSearch for integrated vector search
+
+** Monitoring
+
+Implement monitoring for production deployments:
+
+1. *API Usage*: Track rate of embedding and LLM API calls
+2. *Cache Efficiency*: Monitor cache hit rates
+3. *Response Latency*: Track query response times
+4. *Error Rates*: Monitor failures and retries
+
+** Security Considerations
+
+1. *API Key Management*: Use environment variables or a secrets manager
+2. *Rate Limiting*: Implement rate limiting to protect against abuse
+3. *Input Validation*: Sanitize all user inputs
+4. *Access Control*: Implement authentication for multi-user deployments

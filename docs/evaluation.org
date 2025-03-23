@@ -1,0 +1,61 @@
+#+TITLE: Legal RAG System Evaluation Framework
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: Evaluation framework for the Legal RAG system
+
+* Evaluation Framework
+
+** Overview
+
+The Legal RAG system includes a comprehensive evaluation framework to assess response quality across multiple dimensions.
+
+** Evaluation Metrics
+
+1. *Relevance*: How well the response addresses the query (0.0-1.0)
+2. *Accuracy*: Correctness of the legal information provided (0.0-1.0)
+3. *Citation Quality*: Appropriateness and accuracy of citations (0.0-1.0) 
+4. *Jurisdiction Compliance*: How well the response respects jurisdiction preferences (0.0-1.0)
+5. *Completeness*: Comprehensiveness of the response (0.0-1.0)
+
+** Implementation
+
+The evaluation is implemented in ~legal_rag/evaluation.hy~:
+
+#+begin_src hy
+(defn evaluate-response [query answer citations retrieved-docs]
+  "Evaluate the quality of a RAG response"
+  
+  ;; Calculate relevance score
+  (setv relevance (calculate-relevance query answer retrieved-docs))
+  
+  ;; Calculate accuracy score
+  (setv accuracy (calculate-accuracy answer retrieved-docs))
+  
+  ;; Calculate citation quality
+  (setv citation-quality (calculate-citation-quality citations retrieved-docs))
+  
+  ;; Calculate jurisdiction compliance
+  (setv jurisdiction-compliance (calculate-jurisdiction-compliance citations))
+  
+  ;; Calculate completeness
+  (setv completeness (calculate-completeness answer query))
+  
+  ;; Return combined scores
+  {"relevance" relevance
+   "accuracy" accuracy
+   "citation_quality" citation-quality
+   "jurisdiction_compliance" jurisdiction-compliance
+   "completeness" completeness})
+#+end_src
+
+** Usage
+
+The evaluation is automatically performed during the query process and included in the response object:
+
+#+begin_src hy
+(setv response (rag-system.query "What constitutes fair use?"))
+
+;; Access evaluation metrics
+(print response.evaluation)
+#+end_src
