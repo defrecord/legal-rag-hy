@@ -1,0 +1,79 @@
+#+TITLE: Round-Trip Editing Example
+#+AUTHOR: DefRecord Team
+#+EMAIL: info@defrecord.com
+#+DATE: 2025-03-23
+#+DESCRIPTION: An example demonstrating round-trip editing with org-mode
+#+PROPERTY: header-args:hy :tangle yes
+
+* Round-Trip Editing Example
+
+This example demonstrates how to use the round-trip editing capabilities of the literate programming setup.
+
+** Example Component
+
+This is a simple component with documentation inline:
+
+#+begin_src hy :tangle src/legal_rag/example_component.hy
+#!/usr/bin/env hy
+
+;; A simple example component to demonstrate round-trip editing
+
+(import
+  [datetime [datetime]]
+  [typing [Dict List Any Optional]]
+  [dataclasses [dataclass]])
+
+(dataclass
+  (defclass ExampleModel []
+    "Example model for demonstration purposes"
+    (^str name None)
+    (^Dict metadata {})))
+
+(defn process-example [input-data]
+  "Process the input data and return a result
+  
+  Parameters:
+    input-data: The data to process
+    
+  Returns:
+    A processed version of the data"
+    
+  (setv result (.copy input-data))
+  (setv (get result "processed") True)
+  (setv (get result "timestamp") (str (datetime.now)))
+  
+  result)
+
+(defn main []
+  "Main function demonstration"
+  (print "Example component loaded")
+  (setv test-data {"message" "Hello from round-trip editing!"})
+  (setv processed (process-example test-data))
+  (print f"Processed data: {processed}")
+  processed)
+
+(when (= __name__ "__main__")
+  (main))
+#+end_src
+
+** Usage Example
+
+You can use this component as follows:
+
+#+begin_src hy
+(import [legal-rag.example-component [process-example]])
+
+(setv my-data {"content" "Test content"})
+(setv result (process-example my-data))
+(print result)
+#+end_src
+
+** How Round-Trip Editing Works
+
+1. Edit this org file with both code and documentation
+2. Run ~make tangle~ to generate the Hy file
+3. Make direct edits to the Hy file if needed
+4. Run ~make detangle~ to sync those changes back to this org file
+5. Verify that your changes appear in both files
+
+This workflow allows for flexible editing while keeping code and documentation synchronized.

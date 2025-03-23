@@ -21,12 +21,27 @@ clean: ## Clean generated files and caches
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .ipynb_checkpoints -exec rm -rf {} +
 
-tangle: ## Extract code from org files
+tangle: ## Extract code from org files (org → hy)
 	@echo "Tangling code from org files..."
 	emacs --batch \
 		--eval "(require 'org)" \
-		--eval "(dolist (file (directory-files-recursively \"./src\" \"\\.org$\")) (with-current-buffer (find-file file) (org-babel-tangle)))" \
+		--eval "(dolist (file (directory-files-recursively \"./\" \"\\.org$\")) (with-current-buffer (find-file file) (org-babel-tangle)))" \
 		--kill
+	@echo "Tangling complete. Code files generated from org source."
+
+detangle: ## Update org files from code changes (hy → org)
+	@echo "Detangling code back to org files..."
+	emacs --batch \
+		--eval "(require 'org)" \
+		--eval "(setq org-src-preserve-indentation t)" \
+		--eval "(dolist (file (directory-files-recursively \"./src\" \"\\.hy$\")) \
+		        (let* ((file-path file) \
+		               (org-files (directory-files-recursively \"./\" \"\\.org$\"))) \
+		          (dolist (org-file org-files) \
+		            (with-current-buffer (find-file org-file) \
+		              (org-babel-detangle file-path)))))" \
+		--kill
+	@echo "Detangling complete. Changes from code files synced back to org source."
 
 install: ## Install the package
 	uv pip install -e .

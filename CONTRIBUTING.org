@@ -111,11 +111,11 @@ Update documentation when you make changes:
 
 ** Literate Programming Workflow
 
-We use org-mode literate programming to maintain code and documentation together:
+We use org-mode literate programming to maintain code and documentation together with full round-trip editing support:
 
 1. Main implementation is in =src/legal_rag.org=
 2. Edit the org file to modify both code and documentation
-3. Use the Makefile to tangle code:
+3. Use the Makefile to tangle code (org → hy):
    #+begin_src bash
    make tangle
    #+end_src
@@ -123,6 +123,34 @@ We use org-mode literate programming to maintain code and documentation together
    #+begin_src bash
    make test
    #+end_src
+5. If you make direct edits to Hy files, sync them back to org files (hy → org):
+   #+begin_src bash
+   make detangle
+   #+end_src
+
+*** Literate Programming Best Practices
+
+When creating or editing org-mode files with code blocks:
+
+1. Use appropriate header arguments for tangling:
+   #+begin_example
+   #+begin_src hy :tangle src/legal_rag/component.hy
+   (defn example-function []
+     "This is an example function")
+   #+end_src
+   #+end_example
+
+2. For proper detangling, include reference markers (these are added automatically when tangling):
+   #+begin_example
+   ;; [[file:../../src/legal_rag.org::*Function Name][Function Name:1]]
+   (defn example-function []
+     "This is an example function")
+   ;; Function Name:1 ends here
+   #+end_example
+
+3. Organize org files with clear section structure using headings
+
+4. Always commit the org files as the authoritative source, not just the generated code
 
 ** Feature Requests and Bug Reports
 

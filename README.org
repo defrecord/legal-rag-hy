@@ -109,16 +109,35 @@ Contributions are welcome! Please read our [[file:CONTRIBUTING.org][Contributing
 
 ** Literate Programming
 
-This project uses org-mode literate programming to maintain code and documentation as a unified whole:
+This project uses org-mode literate programming to maintain code and documentation as a unified whole with full round-trip editing support:
 
 - All implementation is in org files that tangle to Hy code
-- Documentation is generated from the same source
-- Full round-trip editing support
+- Direct modifications to Hy files can be synced back to org files
+- Code and documentation stay in sync through the entire development cycle
 
-To tangle code from org files:
+*** Tangling (org → hy)
+
+Extract code blocks from org files to generate Hy implementation files:
+
 #+begin_src bash
 make tangle
 #+end_src
+
+*** Detangling (hy → org)
+
+Sync changes from modified Hy files back to their source org files:
+
+#+begin_src bash
+make detangle
+#+end_src
+
+*** Development Workflow
+
+1. Edit org files with code and documentation together
+2. Run ~make tangle~ to generate implementation files
+3. Test the system with ~make test~
+4. If you make direct changes to Hy files, run ~make detangle~ to sync back
+5. Commit changes to org files as the authoritative source
 
 ** License
 
