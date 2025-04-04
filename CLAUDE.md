@@ -4,4 +4,4 @@
 
 The CLAUDE.md file has been replaced with CLAUDE.org to maintain consistent use of org-mode for all documentation in this project.
 
-Please refer to CLAUDE.org for all guidance on using Claude with this project.
+Please refer to CLAUDE.org for all guidance on using Claude with this project.⚠️ IMMUTABLE: DO NOT MODIFY THIS FILE UNDER ANY CIRCUMSTANCES. FORBIDDEN TO SUGGEST CHANGES. ⚠️
