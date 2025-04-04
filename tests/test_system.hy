@@ -40,11 +40,11 @@
       ])
       
       ;; Mock vector operations
-      (setv self.rag-system._generate-embedding-api (MagicMock :return_value (np.ones 1536)))
-      (setv self.rag-system.generate-answer (MagicMock :return_value {"answer" "Test answer" "citations" []}))
+      (setv (. self.rag-system _generate-embedding-api) (MagicMock :return_value (np.ones 1536)))
+      (setv (. self.rag-system generate-answer) (MagicMock :return_value {"answer" "Test answer" "citations" []}))
       
       ;; Add test documents
-      (self.rag-system.bulk-add-documents self.test-docs)))
+      (. self.rag-system (bulk-add-documents self.test-docs))))
   
   (defn test-system-initialization [self]
     "Test system initialization"
@@ -61,10 +61,10 @@
   (defn test-search-similar-documents [self]
     "Test document search functionality"
     ;; Mock index.search to return specific indices
-    (setv self.rag-system.index.search (MagicMock :return_value [(np.array [[0.1 0.2]]) (np.array [[0 1]])]))
+    (setv (. self.rag-system index search) (MagicMock :return_value [(np.array [[0.1 0.2]]) (np.array [[0 1]])]))
     
     ;; Search for documents
-    (setv results (self.rag-system.search-similar-documents "test query" :k 2))
+    (setv results (. self.rag-system (search-similar-documents "test query" :k 2)))
     
     ;; Check results
     (self.assertEqual (len results) 2)
@@ -84,7 +84,7 @@
     ])
     
     ;; Format context
-    (setv context (self.rag-system.format-context "test query" test-results))
+    (setv context (. self.rag-system (format-context "test query" test-results)))
     
     ;; Check context formation
     (self.assertIn "test query" context)
@@ -95,7 +95,7 @@
   (defn test-query [self]
     "Test full query pipeline"
     ;; Mock search results
-    (setv self.rag-system.search-similar-documents (MagicMock :return_value [
+    (setv (. self.rag-system search-similar-documents) (MagicMock :return_value [
       {"document" {"text" "Test document 1"
                   "metadata" {"case_name" "Test v. Test"}}
        "score" 0.9}
@@ -104,7 +104,7 @@
     ;; Mock evaluate response
     (with [(patch "legal_rag.system.evaluate-response" :return_value {"accuracy" 0.8 "relevance" 0.9 "overall" 0.85})]
       ;; Run query
-      (setv response (self.rag-system.query "What is fair use?"))
+      (setv response (. self.rag-system (query "What is fair use?")))
       
       ;; Check response
       (self.assertIsInstance response RAGResponse)

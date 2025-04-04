@@ -2,7 +2,7 @@
 # 
 # This Makefile provides commands for development, testing, and documentation.
 
-.PHONY: help clean tangle test coverage lint format docs install dev citation
+.PHONY: help clean tangle test coverage lint format docs install dev citation conference-demo
 
 # Default target shows help
 help:
@@ -10,11 +10,15 @@ help:
 	@echo ""
 	@echo "Usage:"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 	@echo ""
-	@echo "Example:"
-	@echo "  make test       # Run all tests"
-	@echo "  make coverage   # Run tests with coverage report"
+	@echo "Examples:"
+	@echo "  make test             # Run all tests"
+	@echo "  make coverage         # Run tests with coverage report"
+	@echo ""
+	@echo "Conference Demo:"
+	@echo "  make conference-setup # Install dependencies for the conference demo"
+	@echo "  make conference-demo  # Run the conference demo scripts"
 
 clean: ## Clean generated files and caches
 	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ .coverage htmlcov/
@@ -25,7 +29,7 @@ tangle: ## Extract code from org files (org → hy)
 	@echo "Tangling code from org files..."
 	emacs --batch \
 		--eval "(require 'org)" \
-		--eval "(dolist (file (directory-files-recursively \"./\" \"\\.org$\")) (with-current-buffer (find-file file) (org-babel-tangle)))" \
+		--eval '(dolist (file (directory-files-recursively "./" "\\.org$")) (with-current-buffer (find-file file) (org-babel-tangle)))' \
 		--kill
 	@echo "Tangling complete. Code files generated from org source."
 
@@ -111,3 +115,23 @@ notebook: ## Start Jupyter notebook for examples
 
 version: ## Show the current version
 	@grep "__version__" src/legal_rag/__init__.hy | cut -d '"' -f2
+	
+conference-setup: ## Set up environment for conference demo
+	@echo "Setting up for conference demo..."
+	@./scripts/setup-conference-demo.sh
+	@echo "Setup complete! Run 'make conference-demo' to start the demo"
+
+conference-demo: ## Run the conference demo
+	@echo "Running Legal RAG conference demo..."
+	@if [ -z "$$OPENAI_API_KEY" ]; then \
+		echo "Warning: OPENAI_API_KEY environment variable not set."; \
+		echo "Running simple demo only. Set your API key for the full demo."; \
+		./demo-simple.hy; \
+	else \
+		echo "Running simple compatibility demo..."; \
+		./demo-simple.hy; \
+		echo ""; \
+		echo "Press Enter to continue to the full Legal RAG demo..."; \
+		read; \
+		hy src/legal_rag/demo.hy; \
+	fi

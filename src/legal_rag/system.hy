@@ -1,26 +1,25 @@
 #!/usr/bin/env hy
 
-(import
-  os
-  json
-  [datetime [datetime timedelta]]
-  [typing [Dict List Any Optional Tuple]]
-  [functools [lru_cache]]
-  [dataclasses [dataclass]]
-  
-  ;; Vector database and embeddings
-  numpy :as np
-  faiss
-  
-  ;; LLM client
-  openai
-  
-  ;; Local imports
-  [.cache [EmbeddingCache]]
-  [.citation [format-citation parse-citation]]
-  [.jurisdiction [get-jurisdiction-boost calculate-precedential-value]]
-  [.evaluation [evaluate-response]]
-  [.utils [retry_with_exponential_backoff timeout]])
+(import os)
+(import json)
+(import [datetime [datetime timedelta]])
+(import [typing [Dict List Any Optional Tuple]])
+(import [functools [lru_cache]])
+(import [dataclasses [dataclass]])
+
+;; Vector database and embeddings
+(import numpy :as np)
+(import faiss)
+
+;; LLM client
+(import openai)
+
+;; Local imports
+(import [.cache [EmbeddingCache]])
+(import [.citation [format-citation parse-citation]])
+(import [.jurisdiction [get-jurisdiction-boost calculate-precedential-value]])
+(import [.evaluation [evaluate-response]])
+(import [.utils [retry_with_exponential_backoff timeout]])
 
 ;; Configure API key
 (setv openai.api_key (os.getenv "OPENAI_API_KEY"))
@@ -69,7 +68,7 @@
         ;; Load existing index
         (do
           (setv self.index (faiss.read_index index-path))
-          (with [f (open f"{index-path}.meta" "r")]
+          (with [f (open (+ index-path ".meta") "r")]
             (setv self.document-store (json.load f))))
         
         ;; Initialize new index
@@ -81,7 +80,7 @@
   (defn save-index [self index-path]
     "Save the FAISS vector index to disk"
     (faiss.write_index self.index index-path)
-    (with [f (open f"{index-path}.meta" "w")]
+    (with [f (open (+ index-path ".meta") "w")]
       (json.dump self.document-store f)))
   
   (defn add-document [self document]
@@ -94,10 +93,10 @@
           
           ;; Add to FAISS index
           document-id (len self.document-store)
-          _ (self.index.add (np.array [embedding] :dtype np.float32))
+          _ (. self.index (add (np.array [embedding] :dtype np.float32)))
           
           ;; Add to document store
-          document-with-embedding (.copy document)
+          document-with-embedding (. document (copy))
           _ (setv (get document-with-embedding "embedding") embedding)
           _ (setv (get self.document-store (str document-id)) document-with-embedding)]
       
@@ -106,29 +105,31 @@
   (defn bulk-add-documents [self documents]
     "Add multiple documents to the vector index"
     (let [document-ids (lfor doc documents
-                             (self.add-document doc))]
+                            (self.add-document doc))]
       document-ids))
   
-  @(retry_with_exponential_backoff
-    :initial-delay 1
-    :max-retries 3
-    :factor 2)
-  @(timeout :seconds 10)
-  (defn generate-embedding [self text]
-    "Generate embedding for text using OpenAI API with caching"
-    
-    (if (and self.use-cache (hasattr self "embedding-cache"))
-        ;; Try to get from cache first
-        (let [cached-embedding (self.embedding-cache.get text)]
-          (if cached-embedding
-              cached-embedding
-              ;; Not in cache, generate and store
-              (let [embedding (self._generate-embedding-api text)]
-                (self.embedding-cache.set text embedding)
-                embedding)))
+  ;; Decorators need to use with-decorator syntax in Hy 1.0
+  (setv generate-embedding
+    ((retry_with_exponential_backoff
+      :initial-delay 1
+      :max-retries 3
+      :factor 2)
+     ((timeout :seconds 10)
+      (fn [self text]
+        "Generate embedding for text using OpenAI API with caching"
         
-        ;; No cache, directly call API
-        (self._generate_embedding_api text)))
+        (if (and self.use-cache (hasattr self "embedding-cache"))
+            ;; Try to get from cache first
+            (let [cached-embedding (. self.embedding-cache (get text))]
+              (if cached-embedding
+                  cached-embedding
+                  ;; Not in cache, generate and store
+                  (let [embedding (self._generate-embedding-api text)]
+                    (. self.embedding-cache (set text embedding))
+                    embedding)))
+            
+            ;; No cache, directly call API
+            (self._generate-embedding-api text))))))
   
   (defn _generate-embedding-api [self text]
     "Generate embedding via API call"
@@ -157,19 +158,19 @@
                             (* base-score jurisdiction-boost)))
           
           ;; Perform search
-          [distances indices] (self.index.search (np.array [query-embedding] :dtype np.float32) (* k 2))
+          [distances indices] (. self.index (search (np.array [query-embedding] :dtype np.float32) (* k 2)))
           
           ;; Get documents and calculate custom scores
           results []
-          _ (for [idx indices[0]]
+          _ (for [idx (get indices 0)]
               (when (>= idx 0)
                 (let [doc-id (str idx)
                       document (get self.document-store doc-id)
                       embedding (get document "embedding")
                       score (similarity-fn idx embedding)]
                   
-                  (.append results {"document" document
-                                   "score" score}))))
+                  (. results (append {"document" document
+                                     "score" score})))))
           
           ;; Sort by custom score and take top k
           sorted-results (sorted results :key (fn [r] (- (get r "score"))))
@@ -189,56 +190,58 @@
     "Format retrieved documents into LLM context"
     (let [;; Extract document content with metadata
           documents (lfor result results
-                         (let [doc (get result "document")
-                               text (get doc "text")
-                               meta (get doc "metadata")
-                               citation (format-citation meta)
-                               score (get result "score")]
-                           {"content" text
-                            "citation" citation
-                            "relevance" score}))
+                       (let [doc (get result "document")
+                             text (get doc "text")
+                             meta (get doc "metadata")
+                             citation (format-citation meta)
+                             score (get result "score")]
+                         {"content" text
+                          "citation" citation
+                          "relevance" score}))
           
           ;; Order by relevance and create context string
           context-parts (lfor [i doc] (enumerate documents)
-                             (format "Document #{(+ i 1)}: {(get doc \"content\")}\n"
-                                    "Citation: {(get doc \"citation\")}\n"
-                                    "Relevance: {(get doc \"relevance\"):.4f}\n\n"))
+                           (format "Document #{(+ i 1)}: {(get doc \"content\")}\n"
+                                  "Citation: {(get doc \"citation\")}\n"
+                                  "Relevance: {(get doc \"relevance\"):.4f}\n\n"))
           
           ;; Combine with query
           system-context (format "Use these documents to answer the legal query.\n"
                                 "Always cite specific documents in your answer.\n"
                                 "If documents are insufficient, state this clearly.\n\n"
                                 "Query: {query}\n\n"
-                                "Retrieved documents:\n{(.join \"\" context-parts)}"))]
+                                "Retrieved documents:\n{(. \"\" (join context-parts))}"))]
       
       system-context))
   
-  @(retry_with_exponential_backoff
-    :initial-delay 1
-    :max-retries 3
-    :factor 2)
-  @(timeout :seconds 30)
-  (defn generate-answer [self context]
-    "Generate answer using LLM"
-    (let [messages [{"role" "system"
-                     "content" "You are a legal research assistant with expertise in case law and legislation. Provide accurate, well-cited answers."}
-                    {"role" "user"
-                     "content" context}]
-          
-          response (openai.chat.completions.create
-                     :model self.llm-model
-                     :messages messages
-                     :max_tokens self.max-tokens
-                     :temperature 0.2)
-          
-          answer (get (get response "choices" [{}]) 0 {})
-          answer-text (get (get answer "message" {}) "content" "")
-          
-          ;; Extract citations from the response
-          citations (parse-citation answer-text)]
-      
-      {"answer" answer-text
-       "citations" citations}))
+  ;; Decorators need to use with-decorator syntax in Hy 1.0
+  (setv generate-answer
+    ((retry_with_exponential_backoff
+      :initial-delay 1
+      :max-retries 3
+      :factor 2)
+     ((timeout :seconds 30)
+      (fn [self context]
+        "Generate answer using LLM"
+        (let [messages [{"role" "system"
+                       "content" "You are a legal research assistant with expertise in case law and legislation. Provide accurate, well-cited answers."}
+                      {"role" "user"
+                       "content" context}]
+            
+            response (openai.chat.completions.create
+                       :model self.llm-model
+                       :messages messages
+                       :max_tokens self.max-tokens
+                       :temperature 0.2)
+            
+            answer (get (get response "choices" [{}]) 0 {})
+            answer-text (get (get answer "message" {}) "content" "")
+            
+            ;; Extract citations from the response
+            citations (parse-citation answer-text)]
+        
+        {"answer" answer-text
+         "citations" citations})))))
   
   (defn query [self query]
     "Full query pipeline"

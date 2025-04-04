@@ -1,10 +1,11 @@
 #!/usr/bin/env hy
 
-(import sys
-        os
-        numpy :as np
-        [.system [LegalRAGSystem]]
-        [.cache [EmbeddingCache]])
+(import sys)
+(import os)
+(import numpy :as np)
+(import [.system [LegalRAGSystem]])
+(import [.cache [EmbeddingCache]])
+(import [.citation [format-citation]])
 
 (defn generate-sample-documents []
   "Generate sample legal documents for demo"
@@ -58,15 +59,15 @@
   
   ;; Add sample documents
   (setv sample-docs (generate-sample-documents))
-  (rag-system.bulk-add-documents sample-docs)
+  (. rag-system (bulk-add-documents sample-docs))
   (print f"Added {(len sample-docs)} sample documents to the system.\n")
   
   ;; Interactive query loop
   (print "Enter legal queries about fair use (or 'exit' to quit):")
   (while True
     (print "\nQuery> " :end "")
-    (sys.stdout.flush)
-    (setv query (.strip (input)))
+    (. sys stdout (flush))
+    (setv query (. (input) (strip)))
     
     (when (or (= query "exit") (= query "quit"))
       (break))
@@ -76,7 +77,7 @@
       (continue))
     
     (print "\nProcessing query...")
-    (setv response (rag-system.query query))
+    (setv response (. rag-system (query query)))
     
     (print "\n" (+ "=" (* 80 "-")))
     (print response.answer)

@@ -37,8 +37,35 @@ The Legal RAG System provides an efficient, accurate, and jurisdiction-aware app
 git clone https://github.com/defrecord/legal-rag-hy.git
 cd legal-rag-hy
 
-# Install dependencies
+# Ensure you have Hy 1.0.0 installed
+pip install "hy==1.0.0"
+
+# Install dependencies (option 1 - with pip)
 pip install -e .
+
+# OR with Poetry (recommended)
+poetry install
+
+# Set your OpenAI API key
+export OPENAI_API_KEY=your_api_key_here
+#+END_SRC
+
+*** Quick Start for Conference Demo
+
+For the conference demo, use our simplified setup:
+
+#+BEGIN_SRC bash
+# Install core dependencies
+pip install "hy==1.0.0" openai faiss-cpu numpy
+
+# Run the simple demo
+cd legal-rag-hy
+./demo-simple.hy
+
+# Run the full demo (requires OpenAI API key)
+cd legal-rag-hy
+python3 -m pip install -e .
+hy src/legal_rag/demo.hy
 #+END_SRC
 
 ** Usage
@@ -46,7 +73,8 @@ pip install -e .
 Basic usage example:
 
 #+BEGIN_SRC hy
-(import [legal-rag.system [LegalRAGSystem]])
+;; Hy 1.0 compatible code
+(import [legal_rag.system [LegalRAGSystem]])
 
 ;; Initialize the system
 (setv rag-system (LegalRAGSystem 
@@ -56,14 +84,16 @@ Basic usage example:
 
 ;; Query the system
 (setv query "What constitutes fair use under copyright law?")
-(setv response (rag-system.query query))
+(setv response (. rag-system (query query)))
 
 ;; Display the response with citations
 (print response.answer)
 (print "\nCitations:")
 (for [citation response.citations]
-  (print citation))
+  (print (get citation "citation")))
 #+END_SRC
+
+*Important:* Note the Hy 1.0 method call syntax: `(. object (method args))` instead of `object.method(args)`.
 
 ** Architecture
 

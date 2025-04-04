@@ -1,12 +1,11 @@
 #!/usr/bin/env hy
 
-(import
-  time
-  functools
-  threading
-  [typing [Any Callable TypeVar Optional]]
-  [concurrent.futures [ThreadPoolExecutor TimeoutError]]
-  [signal [signal SIGALRM SIG_IGN alarm]])
+(import time)
+(import functools)
+(import threading)
+(import [typing [Any Callable TypeVar Optional]])
+(import [concurrent.futures [ThreadPoolExecutor TimeoutError]])
+(import [signal [signal SIGALRM SIG_IGN alarm]])
 
 ;; Type variable for function return type
 (setv T (TypeVar "T"))
@@ -32,20 +31,20 @@
                                       [SystemExit])))
               (raise e))
             
-            (print f"Retrying {func.__name__} in {delay} seconds (attempt {retry-count}/{max-retries}) due to {e}")
+            (print f"Retrying {(. func __name__)} in {delay} seconds (attempt {retry-count}/{max-retries}) due to {e}")
             (time.sleep delay)
             (setv delay (* delay factor))))))
     
-    (return wrapper))
+    wrapper)
   
-  (return decorator))
+  decorator)
 
 (defn timeout [seconds]
   "Decorator to timeout a function after specified seconds (Unix-only)"
   (defn decorator [func]
     (defn wrapper [#* args #** kwargs]
       (defn handler [signum frame]
-        (raise (TimeoutError f"Function {func.__name__} timed out after {seconds} seconds")))
+        (raise (TimeoutError f"Function {(. func __name__)} timed out after {seconds} seconds")))
       
       ;; Set the timeout handler
       (signal SIGALRM handler)
@@ -62,20 +61,20 @@
           (signal SIGALRM SIG_IGN)  ; Ignore future alarms
           result)))
     
-    (return wrapper))
+    wrapper)
   
-  (return decorator))
+  decorator)
 
 (defn async-function [func]
   "Decorator to run a function asynchronously"
   (defn wrapper [#* args #** kwargs]
     (setv executor (ThreadPoolExecutor :max_workers 1))
-    (setv future (.submit executor func #* args #** kwargs))
-    (return future))
+    (setv future (. executor (submit func #* args #** kwargs)))
+    future)
   
-  (return wrapper))
+  wrapper)
 
-(defn parallel_map [func items &optional [max-workers None]]
+(defn parallel-map [func items &optional [max-workers None]]
   "Apply a function to all items in parallel"
   (with [executor (ThreadPoolExecutor :max_workers (or max-workers (min 32 (+ (len items) 4))))]
-    (list (.map executor func items))))
+    (list (. executor (map func items)))))

@@ -57,8 +57,8 @@
         _ (for [pattern CITATION_PATTERNS]
             (let [matches (re.finditer (get pattern "pattern") text)]
               (for [match matches]
-                (let [groups (.groups match)
-                      citation {"citation" (.group match 0)
+                (let [groups (. match (groups))
+                      citation {"citation" (. match (group 0))
                                 "volume" (get groups 0)
                                 "page" (get groups 1)
                                 "format" (get pattern "format")
@@ -66,12 +66,12 @@
                   (when (>= (len groups) 3)
                     (setv (get citation "year") (get groups 2)))
                   
-                  (.append citations citation)))))]
+                  (. citations (append citation)))))]
     
     ;; Return unique citations
     (let [unique-citations {}
           _ (for [citation citations]
               (setv (get unique-citations (get citation "citation")) citation))
-          result (list (.values unique-citations))]
+          result (list (. unique-citations (values)))]
       
       result)))
