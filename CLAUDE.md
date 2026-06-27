@@ -1,9 +1,54 @@
-# CLAUDE.md (DEPRECATED)
-
-**This file is deprecated. Please see CLAUDE.md for the current Claude Code guidelines.**
-
-The CLAUDE.md file has been replaced with CLAUDE.md to maintain consistent use of org-mode for all documentation in this project.
-
-Please refer to CLAUDE.md for all guidance on using Claude with this project.⚠️ IMMUTABLE: DO NOT MODIFY THIS FILE UNDER ANY CIRCUMSTANCES. FORBIDDEN TO SUGGEST CHANGES. ⚠️
-
-- Use `--trailer` for co-author and do not generate content within the body of commit messages
+# Claude Code Guidelines for Legal RAG System
+Author: DefRecord Team
+Email: info@defrecord.com
+Date: 2025-04-03
+Description: Guidelines for using Claude Code with the Legal RAG system project
+## CLAUDE.org
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+### Build/Test/Lint Commands
+#+begin_src bash
+# Install dependencies
+make dev
+# Tangle code from org files (required after org file changes)
+make tangle
+# Run all tests
+make test
+# Run a single test
+python -m pytest tests/specific_test_file.py::TestClass::test_method -v
+# Run tests with coverage
+make coverage
+# Check formatting
+make lint
+# Apply formatting
+make format
+#+end_src
+### Code Style Guidelines
+#### General
+- *Org-mode Literate Programming*: All implementation should be in org-mode files, then tangled
+- After editing org files, run ~make tangle~ to generate code files
+#### Hy Style (Lisp dialect)
+- Use lisp-case (~defn calculate-score~ not ~calculateScore~)
+- 2-space indentation
+- Use threading macros (~->>~) for cleaner data pipelines
+- Prefer functional patterns over imperative ones
+#### Python Integration
+- Follow PEP 8 for Python interfaces
+- Use snake_case for Python functions/variables
+- Line length: 88 characters (Black default)
+- Imports: grouped by stdlib, third-party, local with one blank line between
+- Types: Use type hints where appropriate
+- Error handling: Use specific exceptions with meaningful error messages
+### Git Commit Guidelines
+#### Conventional Commits
+- Format: ~<type>(<scope>): <description>~
+- Types: feat, fix, docs, style, refactor, perf, test, build, ci
+#### Git Trailers (REQUIRED)
+- NEVER use GPG signing (use ~--no-gpg-sign~)
+- Use helper script: ~./scripts/git-commit-with-trailers.sh~
+- All commits MUST include trailers (Driving-Agent, LLM-Agent, LLM-Model, etc.)
+- Do NOT include "Generated with Claude" in commit messages
+### Important Notes
+#### File Precedence and Immutability
+- CLAUDE.org is the official source of truth for Claude Code guidelines
+- CLAUDE.md exists only to direct to CLAUDE.org and must NEVER be modified
+- Always follow org-mode conventions for documentation in this project
